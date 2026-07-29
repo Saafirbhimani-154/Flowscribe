@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  frontend:
+    container_name: flowscribe_frontend_prod
+    env_file: .env.production
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - '7000:7000'
+    restart: always
+    depends_on:
+      - middleware
+
+  middleware:
+    container_name: flowscribe_middleware_prod
+    env_file: .env.production
+    build:
+      context: ./middleware
+      dockerfile: Dockerfile
+    ports:
+      - '6000:6000'
+    restart: always
+    depends_on:
+      - backend
+
+  backend:
+    container_name: flowscribe_backend_prod
+    env_file: ./backend/.env.production
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - '5000:5000'
+    restart: always
+    depends_on:
+      - db
+    command: sh -c "npx tsx src/database/run_migrations.ts && npm start"
+
+  db:
+    container_name: flowscribe_postgres_prod
+    env_file: .env.production
+    image: postgres:15-alpine
+    ports:
+      - '54322:5432'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+    restart: always
+
+volumes:
+  postgres_prod_data:

@@ -1,0 +1,14 @@
+{
+    "name":  "flowscribe",
+    "private":  true,
+    "workspaces":  [
+                        "frontend",
+                        "backend"
+                    ],
+    "scripts":  {
+                    "dev":  "concurrently \"pnpm --filter frontend run dev\" \"pnpm --filter middleware run dev\" \"pnpm --filter backend run dev\""
+                },
+    "devDependencies":  {
+                            "concurrently":  "^10.0.4"
+                        }
+}
