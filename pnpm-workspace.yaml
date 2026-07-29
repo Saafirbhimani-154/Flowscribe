@@ -2,6 +2,9 @@ packages:
   - "frontend"
   - "middleware"
   - "backend"
+allowBuilds:
+  sharp: true
+  unrs-resolver: false
 minimumReleaseAgeExclude:
   - '@next/env@16.2.12'
   - '@next/eslint-plugin-next@16.2.12'

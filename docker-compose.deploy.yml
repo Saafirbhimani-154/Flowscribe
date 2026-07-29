@@ -33,6 +33,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - '5000:5000'
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
     restart: always
     depends_on:
       - db
@@ -52,5 +54,15 @@ services:
       - postgres_prod_data:/var/lib/postgresql/data
     restart: always
 
+  redis:
+    container_name: flowscribe_redis_prod
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_prod_data:/data
+    restart: always
+
 volumes:
   postgres_prod_data:
+  redis_prod_data:
