@@ -47,7 +47,6 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=5000
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
     depends_on:
       - db
     command: sh -c "npx tsx src/database/run_migrations.ts && npm run dev"
@@ -58,21 +57,30 @@ services:
     image: postgres:15-alpine
     ports:
       - '54322:5432'
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
   redis:
     container_name: flowscribe_redis_local
+    env_file: .env.local
     image: redis:7-alpine
     ports:
       - '6379:6379'
     volumes:
       - redis_data:/data
 
+  pgadmin:
+    container_name: flowscribe_pgadmin
+    image: dpage/pgadmin4
+    env_file: .env.local
+    ports:
+      - '5050:80'
+    depends_on:
+      - db
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
 volumes:
   postgres_data:
   redis_data:
+  pgadmin_data:

@@ -16,8 +16,41 @@ It generates the standard system-design diagram set (Activity, State Machine, Us
 - **Database / ORM:** PostgreSQL (Docker) + Prisma
 - **Caching/Queueing:** Redis + BullMQ (for handling multiple users calling the LLM)
 - **Real-Time UX:** Socket.io for streaming backend progress to the frontend
-- **Features:** Strict image limits (max 5), NO video/PDFs, and Speech-to-Text (STT) support for voice notes!
+- **Authentication:** Standard Email/Password stored via HTTP-only Session Cookies (w/ unique Slug IDs).
+- **Data Persistence:** Persistent raw image storage via Google Drive (auto-pruned at 30GB).
+- **AI Engine:** OpenRouter for dynamic model routing (GPT/Claude/Gemini) to process multimodal inputs.
+- **Features:** Strict image limits (max 5 images), Speech-to-Text (STT) for voice prompting, interactive Chatbot UI, and a one-click "Convert to README" export.
 - **Tooling:** pnpm workspaces, Docker Compose (for local dev/deploy)
+
+### Folder Architecture
+```text
+Flowscribe/
+├── frontend/             # React + Vite (Port 7000)
+│   ├── src/
+│   │   ├── components/   # Reusable UI elements
+│   │   ├── pages/        # Dashboard, Login, Landing Page
+│   │   └── lib/          # Utilities & API clients
+│   └── package.json
+├── middleware/           # Next.js BFF (Port 6000)
+│   ├── src/
+│   └── package.json
+├── backend/              # Node + Express (Port 5000)
+│   ├── src/
+│   │   ├── routes/       # API Endpoints
+│   │   ├── controllers/  # Core logic
+│   │   └── services/     # Integrations (OpenRouter, Google Drive)
+│   ├── prisma/           # PostgreSQL Schema & Migrations
+│   └── package.json
+├── docs/                 # Documentation (PRD, BRD, Agent Scripts)
+├── docker-compose.local.yml
+├── pnpm-workspace.yaml
+└── README.md
+```
+
+## Documentation
+The core architecture and business logic have been fully defined by autonomous agents:
+- **[Product Requirements Document (PRD)](./docs/PRD.md):** The complete product specification and feature set.
+- **[Business Requirements Document (BRD)](./docs/business-rules.md):** The core business logic, operational constraints, and daily rate limits.
 
 ---
 

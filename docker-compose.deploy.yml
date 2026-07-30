@@ -33,8 +33,6 @@ services:
       dockerfile: Dockerfile
     ports:
       - '5000:5000'
-    environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
     restart: always
     depends_on:
       - db
@@ -46,16 +44,13 @@ services:
     image: postgres:15-alpine
     ports:
       - '54322:5432'
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
     volumes:
       - postgres_prod_data:/var/lib/postgresql/data
     restart: always
 
   redis:
     container_name: flowscribe_redis_prod
+    env_file: .env.production
     image: redis:7-alpine
     ports:
       - '6379:6379'
@@ -63,6 +58,19 @@ services:
       - redis_prod_data:/data
     restart: always
 
+  pgadmin:
+    container_name: flowscribe_pgadmin_prod
+    image: dpage/pgadmin4
+    env_file: .env.production
+    ports:
+      - '5050:80'
+    depends_on:
+      - db
+    volumes:
+      - pgadmin_prod_data:/var/lib/pgadmin
+    restart: always
+
 volumes:
   postgres_prod_data:
   redis_prod_data:
+  pgadmin_prod_data:
