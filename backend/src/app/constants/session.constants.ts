@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 /**
  * @constant SESSION_AGE

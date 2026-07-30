@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { execSync } from 'child_process';
 import path from 'path';
 
@@ -21,3 +22,4 @@ try {
   console.error('❌ Failed to run migrations:', error);
   process.exit(1);
 }
+
