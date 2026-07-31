@@ -11,7 +11,7 @@ It generates the standard system-design diagram set (Activity, State Machine, Us
 
 ## Tech Stack (3-Tier Architecture)
 - **Frontend:** React + Vite + TypeScript + TailwindCSS + beautiful Skeleton Loaders for UX (Port 7000)
-- **Middleware:** Next.js + TypeScript BFF (Port 6000)
+- **Middleware:** Next.js + TypeScript BFF (Port 6001)
 - **Backend:** Node.js + Express + TypeScript (Port 5000)
 - **Database / ORM:** PostgreSQL (Docker) + Prisma
 - **Caching/Queueing:** Redis + BullMQ (for handling multiple users calling the LLM)
@@ -33,7 +33,7 @@ frontend/
 │   ├── features/     # Isolated feature modules
 │   ├── hooks/        # Reusable React hooks
 │   ├── lib/          # Core utilities & configurations
-│   ├── pages/        # Primary route views (Login, Dashboard)
+│   ├── pages/        # Primary route views (Landing, Login)
 │   ├── routing/      # React Router configurations
 │   ├── services/     # API client integrations
 │   ├── types/        # TypeScript definitions
