@@ -23,14 +23,15 @@ services:
       context: ./middleware
       dockerfile: Dockerfile
     ports:
-      - '6000:6000'
+      - '6001:6001'
     volumes:
       - ./middleware:/app
       - /app/node_modules
     environment:
       - NODE_ENV=development
-      - PORT=6000
+      - PORT=6001
       - WATCHPACK_POLLING=true
+    command: npm run dev
     depends_on:
       - backend
 
