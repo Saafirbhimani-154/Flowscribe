@@ -29,7 +29,7 @@ export default function SignupForm({ onSubmit, isLoading }: SignupFormProps) {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (validateAll()) {
-      onSubmit(e);
+      onSubmit(values);
     }
   };
 
