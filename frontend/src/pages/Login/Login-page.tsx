@@ -11,6 +11,9 @@ export default function LoginPage() {
     <AuthLayout
       title="Welcome Back"
       subtitle="Log in to continue architecting"
+      footerText="Don't have an account?"
+      footerLinkText="Sign up"
+      footerLinkTo="/signup"
     >
       <LoginForm onSubmit={handleLoginSubmit} />
     </AuthLayout>

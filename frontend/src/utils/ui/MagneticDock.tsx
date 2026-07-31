@@ -55,14 +55,16 @@ function DockIcon({ icon: Icon, mouseX, title, href, badge }: DockIconProps) {
       {/* Tooltip */}
       <AnimatePresence>
         {isHovered && (
-          <motion.div
-            initial={{ opacity: 0, y: 10, x: "-50%" }}
-            animate={{ opacity: 1, y: 0, x: "-50%" }}
-            exit={{ opacity: 0, y: 2, x: "-50%" }}
-            className="absolute -top-10 left-1/2 whitespace-pre rounded-md border border-zinc-800 bg-zinc-900 px-2 py-0.5 text-xs font-semibold text-white shadow-sm"
-          >
-            {title}
-          </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 10, x: "-50%" }}
+              animate={{ opacity: 1, y: 0, x: "-50%" }}
+              exit={{ opacity: 0, y: 2, x: "-50%" }}
+              className="absolute -top-12 left-1/2 whitespace-pre rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-xs font-semibold text-zinc-100 shadow-xl z-50"
+            >
+              {title}
+              {/* Tooltip Caret matching Image 1 */}
+              <div className="absolute -bottom-1 left-1/2 h-2.5 w-2.5 -translate-x-1/2 rotate-45 border-b border-r border-zinc-700 bg-zinc-800" />
+            </motion.div>
         )}
       </AnimatePresence>
 
@@ -83,9 +85,10 @@ function DockIcon({ icon: Icon, mouseX, title, href, badge }: DockIconProps) {
 export interface MagneticDockProps {
   items: {
     title: string;
-    icon: LucideIcon;
-    href: string;
+    icon?: LucideIcon;
+    href?: string;
     badge?: number;
+    isSeparator?: boolean;
   }[];
 }
 
@@ -96,18 +99,22 @@ export function MagneticDock({ items }: MagneticDockProps) {
     <motion.div
       onMouseMove={(e) => mouseX.set(e.pageX)}
       onMouseLeave={() => mouseX.set(Infinity)}
-      className="fixed bottom-6 left-1/2 flex h-16 -translate-x-1/2 items-end gap-3 rounded-3xl border border-zinc-800 bg-zinc-950/80 px-4 pb-2 backdrop-blur-md shadow-2xl z-50"
+      className="fixed bottom-6 left-1/2 flex -translate-x-1/2 items-end gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 px-3 pb-2 pt-2 shadow-2xl z-50 transition-all duration-200"
     >
-      {items.map((item, idx) => (
-        <DockIcon
-          key={idx}
-          icon={item.icon}
-          mouseX={mouseX}
-          title={item.title}
-          href={item.href}
-          badge={item.badge}
-        />
-      ))}
+      {items.map((item, idx) => 
+        item.isSeparator ? (
+          <div key={idx} className="w-[2px] h-10 bg-zinc-800 mx-1 self-center rounded-full" />
+        ) : (
+          <DockIcon
+            key={idx}
+            icon={item.icon!}
+            mouseX={mouseX}
+            title={item.title}
+            href={item.href}
+            badge={item.badge}
+          />
+        )
+      )}
     </motion.div>
   );
 }

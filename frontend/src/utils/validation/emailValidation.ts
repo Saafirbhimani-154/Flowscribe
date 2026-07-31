@@ -1,8 +1,9 @@
 import type { ValidationRule } from '../../hooks/useFormValidation';
+import { VALIDATION_MESSAGES } from './validationConstants';
 
 export const emailValidationRules: ValidationRule[] = [
   { 
     pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, 
-    message: 'Please enter a valid email address.' 
+    message: VALIDATION_MESSAGES.EMAIL_INVALID 
   }
 ];

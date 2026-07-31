@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Home, Info, Mail, LogIn } from 'lucide-react';
+import { ArrowRight, Home, Info, Mail, LogIn, UserPlus } from 'lucide-react';
 import ConstellationCanvas from '../../utils/ui/ConstellationCanvas';
 import { MagneticDock } from '../../utils/ui/MagneticDock';
 
@@ -8,6 +8,7 @@ export default function LandingPage() {
     { title: 'Home', icon: Home, href: '/' },
     { title: 'About Us', icon: Info, href: '/about' },
     { title: 'Contact', icon: Mail, href: '/contact' },
+    { title: 'Separator', isSeparator: true },
     { title: 'Login', icon: LogIn, href: '/login' },
   ];
 
