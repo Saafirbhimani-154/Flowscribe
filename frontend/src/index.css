@@ -1,6 +1,89 @@
 @import "tailwindcss";
 
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, sans-serif;
+/* 
+  =========================================
+  FLOWSCRIBE DESIGN SYSTEM (Tailwind v4)
+  =========================================
+*/
+@theme {
+  /* Fonts */
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Custom Colors: Glass & Accents */
+  --color-glass-base: rgba(255, 255, 255, 0.05);
+  --color-glass-border: rgba(255, 255, 255, 0.1);
+  --color-accent-glow: rgba(37, 99, 235, 0.3);
+
+  /* Shadows: Neumorphism & Glassmorphism */
+  --shadow-neumorphic-inset: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-neumorphic-depressed: inset 0 10px 20px rgba(0, 0, 0, 0.5);
+  --shadow-glass-glow: 0 0 20px var(--color-accent-glow);
+  --shadow-glass-elevated: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+
+  /* Blur Utilities for Liquid Glass */
+  --blur-liquid: 120px;
+  --blur-glass: 24px;
+}
+
+/* Global Base Styles */
+@layer base {
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    background-color: var(--color-zinc-950);
+    color: var(--color-zinc-50);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Saafir.dev Shooting Star Animations */
+@keyframes shooting-star {
+  0% {
+    transform: rotate(var(--angle, -45deg)) translateX(0);
+    opacity: 1;
+    width: 0;
+  }
+  15% {
+    width: 150px;
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(var(--angle, -45deg)) translateX(-3000px);
+    opacity: 0;
+    width: 0;
+  }
+}
+
+@keyframes meteor-shower {
+  0% {
+    transform: rotate(var(--angle, -45deg)) translateX(0);
+    opacity: 1;
+    width: 0;
+  }
+  0.6% {
+    width: 150px;
+    opacity: 1;
+  }
+  2% {
+    transform: rotate(var(--angle, -45deg)) translateX(-3000px);
+    opacity: 0;
+    width: 0;
+  }
+  100% {
+    transform: rotate(var(--angle, -45deg)) translateX(-3000px);
+    opacity: 0;
+    width: 0;
+  }
+}
+
+.shooting-star {
+  position: absolute;
+  height: 2px;
+  background: linear-gradient(to left, rgba(255,255,255,0) 0%, #ffffff 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px #60a5fa; /* Adjusted to Flowscribe Blue */
+  transform-origin: left;
+  opacity: 0;
 }

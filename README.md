@@ -11,7 +11,7 @@ It generates the standard system-design diagram set (Activity, State Machine, Us
 
 ## Tech Stack (3-Tier Architecture)
 - **Frontend:** React + Vite + TypeScript + TailwindCSS + beautiful Skeleton Loaders for UX (Port 7000)
-- **Middleware:** Next.js + TypeScript BFF (Port 6000)
+- **Middleware:** Next.js + TypeScript BFF (Port 6001)
 - **Backend:** Node.js + Express + TypeScript (Port 5000)
 - **Database / ORM:** PostgreSQL (Docker) + Prisma
 - **Caching/Queueing:** Redis + BullMQ (for handling multiple users calling the LLM)
@@ -22,29 +22,46 @@ It generates the standard system-design diagram set (Activity, State Machine, Us
 - **Features:** Strict image limits (max 5 images), Speech-to-Text (STT) for voice prompting, interactive Chatbot UI, and a one-click "Convert to README" export.
 - **Tooling:** pnpm workspaces, Docker Compose (for local dev/deploy)
 
-### Folder Architecture
+### 1. Frontend Architecture
 ```text
-Flowscribe/
-├── frontend/             # React + Vite (Port 7000)
-│   ├── src/
-│   │   ├── components/   # Reusable UI elements
-│   │   ├── pages/        # Dashboard, Login, Landing Page
-│   │   └── lib/          # Utilities & API clients
-│   └── package.json
-├── middleware/           # Next.js BFF (Port 6000)
-│   ├── src/
-│   └── package.json
-├── backend/              # Node + Express (Port 5000)
-│   ├── src/
-│   │   ├── routes/       # API Endpoints
-│   │   ├── controllers/  # Core logic
-│   │   └── services/     # Integrations (OpenRouter, Google Drive)
-│   ├── prisma/           # PostgreSQL Schema & Migrations
-│   └── package.json
-├── docs/                 # Documentation (PRD, BRD, Agent Scripts)
-├── docker-compose.local.yml
-├── pnpm-workspace.yaml
-└── README.md
+frontend/
+├── src/
+│   ├── assets/       # Static assets (images, SVGs)
+│   ├── constants/    # App-wide frontend constants
+│   ├── contexts/     # Global React contexts
+│   ├── errors/       # Error boundaries & fallback layouts
+│   ├── features/     # Isolated feature modules
+│   ├── hooks/        # Reusable React hooks
+│   ├── lib/          # Core utilities & configurations
+│   ├── pages/        # Primary route views (Landing, Login)
+│   ├── routing/      # React Router configurations
+│   ├── services/     # API client integrations
+│   ├── types/        # TypeScript definitions
+│   └── utils/        # Generic helper functions
+└── package.json
+```
+
+### 2. Middleware Architecture
+```text
+middleware/
+├── src/
+│   └── app/          # Next.js App Router structure (layout, pages)
+└── package.json
+```
+
+### 3. Backend Architecture
+```text
+backend/
+├── src/
+│   ├── app/
+│   │   ├── api/          # Domain-driven modules (health, flows, users)
+│   │   ├── constants/    # App-wide constants & session types
+│   │   └── middlewares/  # Express middlewares (auth, validation)
+│   ├── bin/
+│   │   └── server.ts     # Express server entry point
+│   ├── database/         # Prisma schema, Postgres & Redis clients
+│   └── utils/            # Shared utilities (jwt, logger, error, env)
+└── package.json
 ```
 
 ## Documentation

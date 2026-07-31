@@ -1,0 +1,10 @@
+import type { ReactNode } from 'react';
+
+export interface AuthLayoutProps {
+  title: string;
+  subtitle: string;
+  children: ReactNode;
+  footerText?: string;
+  footerLinkText?: string;
+  footerLinkTo?: string;
+}

@@ -1,7 +1,11 @@
 # Flowscribe Rules & Guidelines
 
-- **Architecture:** Maintain the Domain-Driven structure in the backend (`src/app/api/`) and Feature-Sliced Design in the frontend (`src/features/`).
-- **Validation:** All incoming API requests must be validated using Zod.
+- **Frontend Architecture:** The frontend must strictly follow the "Component-Per-Section" Domain-Folder-Pattern. Each page/domain must live in `src/pages/[Domain]/` and contain:
+  - `[Domain]-page.tsx` (The main page shell)
+  - `[Domain]-constants.tsx` (All data, strings, and variants extracted here)
+  - `[Domain]-interface.tsx` (TypeScript interfaces)
+  - `[Domain]-Components/` (Directory containing every section as a separate component)
+- **Backend Architecture:** Maintain the Domain-Driven structure in the backend (`src/app/api/`).
 - **Environment:** Distinguish clearly between `.env.local` and `.env.production`.
 - **Database:** All schema changes must be done via Prisma migrations.
 
