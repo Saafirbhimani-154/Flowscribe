@@ -5,10 +5,11 @@ export const AUTH_MESSAGES = {
     LOGGED_IN: 'Logged in successfully.',
   },
   ERROR: {
-    EMAIL_IN_USE: 'This email is already in use.',
-    INVALID_CREDENTIALS: 'The email or password provided is incorrect.',
-    DEFAULT_ROLE_MISSING: 'Internal system error: Default role not found.',
+    EMAIL_IN_USE: 'Email is already in use.',
+    INVALID_CREDENTIALS: 'Login failed. Please check your email and password.',
+    DEFAULT_ROLE_MISSING: 'Internal error: default role not found.',
     INTERNAL_SERVER_ERROR: 'An internal server error occurred.',
+    UNAUTHORIZED: 'Unauthorized',
   },
   VALIDATION: {
     REQUIRED_FIELDS: 'First name, last name, email, and password are required.',
