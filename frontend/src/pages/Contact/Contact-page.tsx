@@ -1,8 +1,18 @@
+import AuthLayout from '../Auth/AuthLayout';
+import ContactForm from './Contact-Components/Contact-form';
+
 export default function ContactPage() {
+  const handleContactSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log("Contact message submitted");
+  };
+
   return (
-    <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center text-white">
-      <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
-      <p className="text-zinc-400">Placeholder for the Contact page.</p>
-    </div>
+    <AuthLayout
+      title="Get in Touch"
+      subtitle="We'd love to hear from you."
+    >
+      <ContactForm onSubmit={handleContactSubmit} />
+    </AuthLayout>
   );
 }

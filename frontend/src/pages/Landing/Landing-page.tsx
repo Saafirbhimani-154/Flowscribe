@@ -1,17 +1,7 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Home, Info, Mail, LogIn, UserPlus } from 'lucide-react';
 import ConstellationCanvas from '../../utils/ui/ConstellationCanvas';
-import { MagneticDock } from '../../utils/ui/MagneticDock';
 
 export default function LandingPage() {
-  const dockItems = [
-    { title: 'Home', icon: Home, href: '/' },
-    { title: 'About Us', icon: Info, href: '/about' },
-    { title: 'Contact', icon: Mail, href: '/contact' },
-    { title: 'Separator', isSeparator: true },
-    { title: 'Login', icon: LogIn, href: '/login' },
-  ];
-
   return (
     <div className="relative min-h-screen bg-zinc-950 overflow-hidden flex flex-col items-center justify-center selection:bg-blue-500/30">
       
@@ -68,10 +58,6 @@ export default function LandingPage() {
         </motion.div>
 
       </div>
-
-      {/* OS-Style Magnetic Dock */}
-      <MagneticDock items={dockItems} />
-      
     </div>
   );
 }

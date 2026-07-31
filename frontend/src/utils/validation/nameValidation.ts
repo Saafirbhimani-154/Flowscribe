@@ -2,10 +2,10 @@ import type { ValidationRule } from '../../hooks/useFormValidation';
 import { VALIDATION_MESSAGES } from './validationConstants';
 import { validateSpaces } from './spaceValidation';
 
-export const emailValidationRules: ValidationRule[] = [
+export const nameValidationRules: ValidationRule[] = [
   { 
-    pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, 
-    message: VALIDATION_MESSAGES.EMAIL_INVALID 
+    validate: (val) => val.length >= 2, 
+    message: VALIDATION_MESSAGES.NAME_MIN_LENGTH 
   },
   {
     validate: validateSpaces,
