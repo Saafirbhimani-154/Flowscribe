@@ -125,7 +125,7 @@ export default function ConstellationCanvas() {
   }, []);
 
   return (
-    <div ref={containerRef} className="absolute inset-0 overflow-hidden pointer-events-none select-none z-0">
+    <div ref={containerRef} className="fixed inset-0 overflow-hidden pointer-events-none select-none z-0">
       {stars.map((star) => (
         <motion.div
           key={star.id}

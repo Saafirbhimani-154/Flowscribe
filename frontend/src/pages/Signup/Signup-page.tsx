@@ -1,5 +1,6 @@
 import SignupForm from './Signup-Components/Signup-form';
 import AuthLayout from '../Auth/AuthLayout';
+import { SIGNUP_PAGE_DATA } from './Signup-constants';
 
 export default function SignupPage() {
   const handleSignupSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -9,11 +10,11 @@ export default function SignupPage() {
 
   return (
     <AuthLayout
-      title="Create an Account"
-      subtitle="Join Flowscribe to build intelligent systems"
-      footerText="Already have an account?"
-      footerLinkText="Sign in"
-      footerLinkTo="/login"
+      title={SIGNUP_PAGE_DATA.title}
+      subtitle={SIGNUP_PAGE_DATA.subtitle}
+      footerText={SIGNUP_PAGE_DATA.footerText}
+      footerLinkText={SIGNUP_PAGE_DATA.footerLinkText}
+      footerLinkTo={SIGNUP_PAGE_DATA.footerLinkTo}
     >
       <SignupForm onSubmit={handleSignupSubmit} />
     </AuthLayout>

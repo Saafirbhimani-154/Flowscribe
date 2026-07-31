@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Lock, User, ArrowRight } from 'lucide-react';
-import type { SignupFormProps } from './Signup-interface';
+import type { SignupFormProps } from '../Signup-interface';
 import NeumorphicInput from '../../../utils/ui/NeumorphicInput';
 import { useFormValidation, type ValidationSchema } from '../../../hooks/useFormValidation';
 import { emailValidationRules } from '../../../utils/validation/emailValidation';

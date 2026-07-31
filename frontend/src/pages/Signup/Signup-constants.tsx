@@ -21,3 +21,11 @@ export const SIGNUP_ANIMATION_VARIANTS = {
     whileTap: { scale: 0.98 }
   }
 };
+
+export const SIGNUP_PAGE_DATA = {
+  title: "Create an Account",
+  subtitle: "Join Flowscribe to build intelligent systems",
+  footerText: "Already have an account?",
+  footerLinkText: "Sign in",
+  footerLinkTo: "/login"
+};
