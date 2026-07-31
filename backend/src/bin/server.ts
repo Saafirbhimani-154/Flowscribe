@@ -1,13 +1,26 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import helmet from 'helmet';
+import dotenv from 'dotenv';
 import appRoutes from '../app/app.routes';
+
+// B-2: Load environment variables FIRST — before any module reads process.env
+dotenv.config({ path: '.env.local' });
+
+// M-6: Guard against missing FRONTEND_URL in production
+if (process.env.NODE_ENV === 'production' && !process.env.FRONTEND_URL) {
+  throw new Error('FATAL: FRONTEND_URL environment variable is not set in production.');
+}
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middlewares
-app.use(express.json());
+// m-1: Security headers via helmet
+app.use(helmet());
+
+// m-2: Strict body size limit to prevent large payload DoS
+app.use(express.json({ limit: '10kb' }));
 app.use(cookieParser());
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:7000',

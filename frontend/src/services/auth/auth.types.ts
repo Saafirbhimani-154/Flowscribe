@@ -1,14 +1,14 @@
 export interface LoginCredentials {
   email: string;
-  password?: string;
+  password: string; // M-3: required, not optional
 }
 
 export interface RegisterCredentials {
   firstName: string;
   lastName: string;
   email: string;
-  password?: string;
-  confirmPassword?: string;
+  password: string; // M-3: required, not optional
+  confirmPassword: string;
 }
 
 export interface AuthUser {
@@ -20,7 +20,8 @@ export interface AuthUser {
   roleId: string;
 }
 
+// Note: No `token` field — token lives exclusively in the HTTP-only cookie (S-6 fix)
 export interface AuthResponse {
-  token: string;
+  message: string;
   user: AuthUser;
 }

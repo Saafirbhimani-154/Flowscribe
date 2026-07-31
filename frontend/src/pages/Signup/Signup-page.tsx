@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import SignupForm from './Signup-Components/Signup-form';
 import AuthLayout from '../Auth/AuthLayout';
 import { SIGNUP_PAGE_DATA } from './Signup-constants';
@@ -7,23 +8,26 @@ import { registerService } from '../../services/auth/auth.service';
 export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate(); // S-4: Safe redirect
 
   const handleSignupSubmit = async (values: any) => {
     setIsLoading(true);
     setError(null);
     try {
-      // confirmPassword is sent to backend; Joi schema accepts it.
-      // Backend creates user, sets cookie, returns token.
+      // M-10: Robust name parsing — handle single-word names gracefully
+      const nameParts = (values.name as string).trim().split(/\s+/);
+      const firstName = nameParts[0] ?? '';
+      const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : firstName; // Use firstName if no lastName given
+
       const payload = {
-        firstName: values.name.split(' ')[0] || values.name,
-        lastName: values.name.split(' ').slice(1).join(' ') || 'User',
-        email: values.email,
-        password: values.password,
-        confirmPassword: values.confirmPassword
+        firstName,
+        lastName,
+        email: values.email as string,
+        password: values.password as string,
+        confirmPassword: values.confirmPassword as string
       };
       await registerService(payload);
-      // Redirect to dashboard or login
-      window.location.href = '/dashboard';
+      navigate('/dashboard');
     } catch (err: any) {
       setError(err.message || 'An error occurred during registration.');
     } finally {

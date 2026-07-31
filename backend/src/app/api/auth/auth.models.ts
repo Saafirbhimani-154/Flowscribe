@@ -1,6 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../../../database/prisma';
 
 export const AuthModel = {
   findUserByEmail: async (email: string) => {
@@ -16,19 +14,43 @@ export const AuthModel = {
     });
   },
 
-  createUser: async (data: any) => {
+  // Used for slug uniqueness collision check
+  findSlugById: async (slugId: string) => {
+    return prisma.user.findUnique({
+      where: { slugId },
+      select: { id: true }
+    });
+  },
+
+  // M-9: Strict typed — no `any` to prevent mass assignment
+  createUser: async (data: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    slugId: string;
+    roleId: string;
+  }) => {
     return prisma.user.create({
       data,
       include: { role: true }
     });
   },
 
-  restoreUser: async (id: string, data: any) => {
+  // M-9: Strict typed — only allowed fields can be updated on restore
+  restoreUser: async (id: string, data: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    slugId: string;
+    roleId: string;
+  }) => {
     return prisma.user.update({
       where: { id },
       data: {
         ...data,
-        deletedAt: null // Clear soft delete flag
+        deletedAt: null // Clear soft delete flag (ghost logic)
       },
       include: { role: true }
     });

@@ -2,22 +2,25 @@ export interface RegisterRequest {
   firstName: string;
   lastName: string;
   email: string;
-  password?: string;
+  password: string; // M-3: required, not optional
 }
 
 export interface LoginRequest {
   email: string;
-  password?: string;
+  password: string; // M-3: required, not optional
 }
 
+export interface AuthUser {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  slugId: string;
+  roleId: string;
+}
+
+// Note: No `token` field — token lives exclusively in the HTTP-only cookie (B-1 fix)
 export interface AuthResponse {
-  token: string;
-  user: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    slugId: string;
-    roleId: string;
-  };
+  message: string;
+  user: AuthUser;
 }

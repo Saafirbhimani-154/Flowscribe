@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import LoginForm from './Login-Components/Login-form';
 import AuthLayout from '../Auth/AuthLayout';
 import { LOGIN_PAGE_DATA } from './Login-constants';
@@ -7,14 +8,14 @@ import { loginService } from '../../services/auth/auth.service';
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate(); // S-4: Safe redirect — useNavigate prevents open redirect
 
   const handleLoginSubmit = async (values: any) => {
     setIsLoading(true);
     setError(null);
     try {
       await loginService(values);
-      // Redirect to dashboard or home
-      window.location.href = '/dashboard';
+      navigate('/dashboard');
     } catch (err: any) {
       setError(err.message || 'An error occurred during login.');
     } finally {

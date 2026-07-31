@@ -12,10 +12,10 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
     }
 
     // Verify token
-    const decoded = jwt.verify(token, AUTH_CONSTANTS.JWT_SECRET as string) as { userId: string };
+    const decoded = jwt.verify(token, AUTH_CONSTANTS.JWT_SECRET as string) as { userId: string; roleId?: string };
 
     // Set user on request
-    req.user = { id: decoded.userId };
+    req.user = { id: decoded.userId, ...(decoded.roleId ? { roleId: decoded.roleId } : {}) };
 
     // Sliding Session: Generate a fresh token with 30m expiry
     const refreshedToken = jwt.sign(
@@ -44,6 +44,7 @@ declare global {
     interface Request {
       user?: {
         id: string;
+        roleId?: string;
       };
     }
   }
