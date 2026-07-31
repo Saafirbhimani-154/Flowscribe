@@ -29,11 +29,12 @@ services:
     volumes:
       - ./middleware:/app
       - /app/node_modules
+      - /app/.next
     environment:
       - NODE_ENV=development
       - PORT=6001
       - WATCHPACK_POLLING=true
-    command: npm run dev
+    command: sh -c "npm i @next/swc-linux-x64-gnu@16.2.12 && npm run dev"
     depends_on:
       - backend
 

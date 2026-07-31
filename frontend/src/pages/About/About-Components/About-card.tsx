@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import type { LucideIcon } from 'lucide-react';
 import { ABOUT_ANIMATION_VARIANTS } from './About-constants';
 import type { AboutCardProps } from '../About-interface';
 

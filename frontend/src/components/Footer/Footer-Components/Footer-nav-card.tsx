@@ -1,27 +1,36 @@
-import { Globe, MessageCircle, Share2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { FOUNDER_INFO, FOOTER_LINKS } from '../Footer-constants';
+import { FLOWSCRIBE_DESCRIPTION, FOOTER_LINKS, SOCIAL_LINKS } from '../Footer-constants';
 
 export default function FooterNavCard() {
   return (
     <div className="w-full lg:w-2/3 bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 lg:p-12 flex flex-col justify-between min-h-[350px]">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         
-        {/* Founder Info Section */}
-        <div className="col-span-1 md:col-span-2 md:pr-8 md:border-r border-zinc-800 flex flex-col justify-center">
-          <div className="text-xs font-bold tracking-widest text-blue-500 uppercase mb-2">
-            {FOUNDER_INFO.title}
+        {/* Brand Info Section */}
+        <div className="col-span-1 md:col-span-2 md:pr-8 md:border-r border-zinc-800 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center gap-2 mb-6">
+              <div className="w-8 h-8 rounded-lg bg-blue-500 flex items-center justify-center text-white font-bold text-xl">F</div>
+              <span className="text-white font-bold text-xl tracking-tight">Flowscribe</span>
+            </div>
+            
+            <p className="text-zinc-400 text-sm leading-relaxed max-w-sm mb-6">
+              {FLOWSCRIBE_DESCRIPTION}
+            </p>
           </div>
-          <h3 className="text-white font-bold text-xl mb-4">{FOUNDER_INFO.name}</h3>
-          <p className="text-zinc-400 text-sm leading-relaxed italic max-w-sm mb-6">
-            "{FOUNDER_INFO.quote}"
-          </p>
-          <div className="flex gap-3">
-            {[Globe, MessageCircle, Share2].map((Icon, i) => (
-              <a key={i} href="#" className="w-10 h-10 rounded-full bg-zinc-800/50 border border-zinc-700 flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-700 hover:border-zinc-600 transition-all">
-                <Icon className="w-4 h-4" />
-              </a>
-            ))}
+
+          <div className="flex flex-col gap-3 mt-auto">
+            <span className="text-zinc-500 font-medium text-sm">Project Links</span>
+            <div className="flex gap-3">
+              {SOCIAL_LINKS.map((link, i) => {
+                const Icon = link.icon;
+                return (
+                  <a key={i} href={link.href} target="_blank" rel="noopener noreferrer" aria-label={link.label} className="w-10 h-10 rounded-full bg-zinc-800/50 border border-zinc-700 flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-700 hover:border-zinc-600 transition-all">
+                    <Icon className="w-4 h-4" />
+                  </a>
+                );
+              })}
+            </div>
           </div>
         </div>
         
