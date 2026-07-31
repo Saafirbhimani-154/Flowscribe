@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 export default function LandingHero() {
   return (
@@ -32,9 +33,9 @@ export default function LandingHero() {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
-          <button className="px-8 py-3.5 bg-white text-zinc-950 hover:bg-zinc-100 font-semibold rounded-full transition-colors w-full sm:w-auto">
+          <Link to="/signup" className="px-8 py-3.5 bg-white text-zinc-950 hover:bg-zinc-100 font-semibold rounded-full transition-colors w-full sm:w-auto text-center">
             Get Started
-          </button>
+          </Link>
         </motion.div>
       </div>
     </div>
