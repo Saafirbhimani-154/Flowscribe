@@ -4,6 +4,7 @@ import LoginPage from '../pages/Login/Login-page';
 import AboutPage from '../pages/About/About-page';
 import ContactPage from '../pages/Contact/Contact-page';
 import SignupPage from '../pages/Signup/Signup-page';
+import FeaturesPage from '../pages/Features/Features-page';
 import PrivacyPage from '../pages/Legal/Privacy-page';
 import TermsPage from '../pages/Legal/Terms-page';
 import { MagneticDock } from '../utils/ui/MagneticDock';
@@ -33,6 +34,7 @@ export function AppRoutes() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/contact" element={<ContactPage />} />
+        <Route path="/features" element={<FeaturesPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
