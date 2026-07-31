@@ -44,8 +44,8 @@ export const register = async (req: Request, res: Response) => {
       });
     }
 
-    const token = jwt.sign({ userId: user.id }, AUTH_CONSTANTS.JWT_SECRET, { 
-      expiresIn: AUTH_CONSTANTS.JWT_EXPIRES_IN 
+    const token = jwt.sign({ userId: user.id }, AUTH_CONSTANTS.JWT_SECRET as string, { 
+      expiresIn: AUTH_CONSTANTS.JWT_EXPIRES_IN as any
     });
 
     res.cookie('flowscribe_token', token, {
@@ -83,8 +83,8 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ error: AUTH_MESSAGES.ERROR.INVALID_CREDENTIALS });
     }
 
-    const token = jwt.sign({ userId: user.id }, AUTH_CONSTANTS.JWT_SECRET, { 
-      expiresIn: AUTH_CONSTANTS.JWT_EXPIRES_IN 
+    const token = jwt.sign({ userId: user.id }, AUTH_CONSTANTS.JWT_SECRET as string, { 
+      expiresIn: AUTH_CONSTANTS.JWT_EXPIRES_IN as any
     });
 
     res.cookie('flowscribe_token', token, {
