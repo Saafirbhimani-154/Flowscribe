@@ -1,13 +1,13 @@
 import { useState, useCallback, useEffect } from 'react';
 
-export type ValidationRule = {
+export type ValidationRule<T = any> = {
   pattern?: RegExp;
-  validate?: (value: string) => boolean;
+  validate?: (value: string, values: T) => boolean;
   message: string;
 };
 
 export type ValidationSchema<T> = {
-  [K in keyof T]?: ValidationRule[];
+  [K in keyof T]?: ValidationRule<T>[];
 };
 
 export function useFormValidation<T extends Record<string, string>>(
@@ -27,7 +27,7 @@ export function useFormValidation<T extends Record<string, string>>(
       if (rule.pattern && !rule.pattern.test(value)) {
         return rule.message;
       }
-      if (rule.validate && !rule.validate(value)) {
+      if (rule.validate && !rule.validate(value, values)) {
         return rule.message;
       }
     }

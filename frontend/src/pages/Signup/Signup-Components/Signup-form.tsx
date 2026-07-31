@@ -10,16 +10,19 @@ import { VALIDATION_MESSAGES } from '../../../utils/validation/validationConstan
 
 export default function SignupForm({ onSubmit, isLoading }: SignupFormProps) {
   
-  const schema: ValidationSchema<{ name: string; email: string; password: string }> = useMemo(() => ({
+  const schema: ValidationSchema<{ name: string; email: string; password: string; confirmPassword: string }> = useMemo(() => ({
     name: [
       { validate: (val) => val.length >= 2, message: VALIDATION_MESSAGES.NAME_MIN_LENGTH }
     ],
     email: emailValidationRules,
-    password: passwordValidationRules
+    password: passwordValidationRules,
+    confirmPassword: [
+      { validate: (val, values) => val === values.password, message: 'Passwords do not match' }
+    ]
   }), []);
 
   const { values, errors, touched, isValid, handleChange, handleBlur, validateAll } = useFormValidation(
-    { name: '', email: '', password: '' },
+    { name: '', email: '', password: '', confirmPassword: '' },
     schema
   );
 
@@ -66,6 +69,18 @@ export default function SignupForm({ onSubmit, isLoading }: SignupFormProps) {
           onChange={handleChange}
           onBlur={handleBlur}
           error={touched.password ? errors.password : undefined}
+          disabled={isLoading}
+        />
+        
+        <NeumorphicInput 
+          icon={Lock}
+          type="password" 
+          name="confirmPassword"
+          placeholder="Confirm Password"
+          value={values.confirmPassword}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          error={touched.confirmPassword ? errors.confirmPassword : undefined}
           disabled={isLoading}
         />
       </div>
