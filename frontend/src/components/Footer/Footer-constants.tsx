@@ -19,6 +19,7 @@ export const FOOTER_LINKS = {
     { label: "Contact Us", href: "/contact" }
   ],
   legal: [
+    { label: "FAQ", href: "/faq" },
     { label: "Terms of Service", href: "/terms" },
     { label: "Privacy Policy", href: "/privacy" }
   ]
