@@ -15,8 +15,8 @@ export default function FaqAccordion({ num, title, content }: FaqAccordionProps)
     <div className="mb-4">
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full flex items-center justify-between gap-6 p-6 group text-left outline-none rounded-2xl transition-all ${
-          isOpen ? 'bg-zinc-900 border border-zinc-800' : 'bg-zinc-900/40 border border-zinc-800/50 hover:bg-zinc-900/60'
+        className={`w-full flex items-center justify-between gap-6 p-6 group text-left outline-none transition-all ${
+          isOpen ? 'bg-zinc-900 border border-zinc-800 rounded-t-2xl border-b-0' : 'bg-zinc-900/40 border border-zinc-800/50 hover:bg-zinc-900/60 rounded-2xl'
         }`}
       >
         <div className="flex items-center gap-6">
@@ -44,7 +44,7 @@ export default function FaqAccordion({ num, title, content }: FaqAccordionProps)
             transition={{ duration: 0.3, ease: 'easeInOut' }}
             className="overflow-hidden"
           >
-            <div className="px-6 pb-6 pt-0 text-zinc-400 leading-relaxed bg-zinc-900 rounded-b-2xl border-x border-b border-zinc-800 -mt-2">
+            <div className="px-6 pb-6 pt-2 text-zinc-400 leading-relaxed bg-zinc-900 rounded-b-2xl border-x border-b border-zinc-800 break-words whitespace-normal w-full overflow-hidden">
               {content}
             </div>
           </motion.div>

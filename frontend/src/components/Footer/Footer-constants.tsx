@@ -1,5 +1,5 @@
 import { Globe } from 'lucide-react';
-import { FaTwitter, FaGithub, FaLinkedin, FaEnvelope } from 'react-icons/fa';
+import { FaGithub, FaLinkedin, FaEnvelope } from 'react-icons/fa';
 
 export const FLOWSCRIBE_DESCRIPTION = "Flowscribe is the intelligent command center for your engineering stack. We instantly turn legacy chaos and complex codebases into elegant, visual blueprints—elevating your software architecture to unprecedented heights.";
 
@@ -24,21 +24,19 @@ export const FOUNDER_QUOTES = [
 ];
 
 export const SOCIAL_LINKS = [
-  { icon: FaGithub, href: "https://github.com/saafir-154/flowscribe", label: "Repository" },
-  { icon: FaEnvelope, href: "mailto:hello@saafir.dev", label: "Email" }
+  { icon: FaGithub, href: "https://github.com/saafirbhimani-154/flowscribe", label: "Repository" },
+  { icon: FaEnvelope, href: "mailto:saafirbhimani@gmail.com", label: "Email" }
 ];
 
 export const FOUNDER_SOCIAL_LINKS = [
   { icon: Globe, href: "https://saafir.dev", label: "Website" },
-  { icon: FaLinkedin, href: "https://linkedin.com/in/saafirbhimani", label: "LinkedIn" },
-  { icon: FaTwitter, href: "https://twitter.com/saafirbhimani", label: "Twitter" },
-  { icon: FaGithub, href: "https://github.com/saafir-154", label: "GitHub" }
+  { icon: FaLinkedin, href: "https://www.linkedin.com/in/saafir-bhimani-59330b397/", label: "LinkedIn" },
+  { icon: FaGithub, href: "https://github.com/saafirbhimani-154", label: "GitHub" }
 ];
 
 export const FOOTER_LINKS = {
   explore: [
     { label: "Home", href: "/" },
-    { label: "About Us", href: "/about" },
     { label: "Features", href: "/features" },
     { label: "Contact Us", href: "/contact" }
   ],

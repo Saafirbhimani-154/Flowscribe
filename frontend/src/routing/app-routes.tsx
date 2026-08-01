@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import LandingPage from '../pages/Landing/Landing-page';
 import LoginPage from '../pages/Login/Login-page';
-import AboutPage from '../pages/About/About-page';
 import ContactPage from '../pages/Contact/Contact-page';
 import SignupPage from '../pages/Signup/Signup-page';
 import FeaturesPage from '../pages/Features/Features-page';
@@ -20,7 +19,7 @@ import SettingsPassword from '../pages/Settings/tabs/SettingsPassword';
 import SettingsLanguage from '../pages/Settings/tabs/SettingsLanguage';
 
 import { MagneticDock } from '../utils/ui/MagneticDock';
-import { Home, Info, Mail, LogIn, LogOut, FileText, Shield, Zap, HelpCircle, Settings, Layout } from 'lucide-react';
+import { Home, Mail, LogIn, LogOut, FileText, Shield, Zap, HelpCircle, Settings, Layout } from 'lucide-react';
 
 function MainLayout() {
   const location = useLocation();
@@ -35,7 +34,6 @@ function MainLayout() {
     { title: 'Home', icon: Home, href: '/' },
     { title: 'Separator 1', isSeparator: true },
     
-    { title: 'About Us', icon: Info, href: '/about' },
     { title: 'Features', icon: Zap, href: '/features' },
     { title: 'Contact', icon: Mail, href: '/contact' },
     { title: 'Separator 2', isSeparator: true },
@@ -60,7 +58,6 @@ function MainLayout() {
     <div className="relative min-h-screen bg-zinc-950">
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/about" element={<AboutPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/features" element={<FeaturesPage />} />
         <Route path="/login" element={<LoginPage />} />
