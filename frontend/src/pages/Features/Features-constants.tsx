@@ -1,40 +1,40 @@
-import { BrainCircuit, GitMerge, Shield, Map, Network, Search } from 'lucide-react';
+import { ImageUp, MessageSquareQuote, ShieldAlert, Network, Zap, GitMerge } from 'lucide-react';
 
 export const FEATURES_DATA = [
   {
-    title: "Automated Architecture Mapping",
-    description: "Flowscribe instantly reads your codebase and generates beautiful, accurate system architecture diagrams without manual input.",
-    icon: Map,
+    title: "Sketch to Flow Parsing (Vision AI)",
+    description: "Upload 1-5 photos of your whiteboard sketches or scribbles. Our Vision AI extracts structured JSON flows instantly, converting messy drawings into logic.",
+    icon: ImageUp,
     color: "from-blue-500 to-cyan-400"
   },
   {
-    title: "Real-Time PR Synchronization",
-    description: "Every pull request is automatically analyzed. See the architectural impact of a change before you hit merge.",
-    icon: GitMerge,
+    title: "Clarifying AI Q&A",
+    description: "Ambiguity detected? The AI flags unclear steps in your sketches and returns a set of clarifying questions to resolve logic dead-ends before writing code.",
+    icon: MessageSquareQuote,
     color: "from-indigo-500 to-purple-400"
   },
   {
-    title: "Zero-Knowledge Parsing",
-    description: "Your code never leaves your VPC. Our parsing engine runs entirely in isolated, military-grade secure containers.",
-    icon: Shield,
+    title: "Deep Gap Audit",
+    description: "We don't just transcribe; we audit. Our AI text model highlights edge cases, missing parameters, and defines robust Definition of Done (DoD) for your feature.",
+    icon: ShieldAlert,
     color: "from-emerald-500 to-teal-400"
   },
   {
-    title: "Interactive Blueprints",
-    description: "Drag, drop, and reorganize. Turn static documentation into living, interactive dashboards that engineers actually use.",
-    icon: BrainCircuit,
+    title: "Mermaid Diagrams & DB Schema",
+    description: "Once the flow is crystallized, we automatically generate interactive Mermaid.js diagrams and propose optimal database schemas to kickstart your backend.",
+    icon: Network,
     color: "from-rose-500 to-orange-400"
   },
   {
-    title: "Cross-Repo Dependencies",
-    description: "Trace microservices and monorepos seamlessly. Understand how changes in one repository cascade across your entire stack.",
-    icon: Network,
-    color: "from-blue-600 to-indigo-600"
+    title: "Live API Mocking",
+    description: "Don't wait for backend engineers. Flowscribe instantly spins up mock API endpoints based on your generated schemas so the frontend team can start building today.",
+    icon: Zap,
+    color: "from-fuchsia-500 to-pink-400"
   },
   {
-    title: "Semantic Code Search",
-    description: "Search your architecture, not just text. Find 'authentication flow' or 'payment gateway' instantly using AI embeddings.",
-    icon: Search,
-    color: "from-violet-500 to-fuchsia-400"
+    title: "Interactive PR Syncing",
+    description: "Keep your flows alive. As your codebase evolves, Flowscribe analyzes PRs and flags when your initial whiteboard logic drifts from the actual implemented code.",
+    icon: GitMerge,
+    color: "from-blue-600 to-indigo-600"
   }
 ];

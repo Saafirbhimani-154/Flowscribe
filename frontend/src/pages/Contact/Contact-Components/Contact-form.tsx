@@ -10,7 +10,7 @@ import { messageValidationRules } from '../../../utils/validation/messageValidat
 import { CONTACT_ANIMATION_VARIANTS, CONTACT_LIMITS } from './Contact-constants';
 
 interface ContactFormProps {
-  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  onSubmit: (e: React.FormEvent<HTMLFormElement>, data: { name: string; email: string; message: string }) => void;
   isLoading?: boolean;
 }
 
@@ -29,7 +29,7 @@ export default function ContactForm({ onSubmit, isLoading }: ContactFormProps) {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (validateAll()) {
-      onSubmit(e);
+      onSubmit(e, values);
     }
   };
 
