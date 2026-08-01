@@ -38,6 +38,5 @@ export const registerService = async (credentials: RegisterCredentials): Promise
 };
 
 export const logoutService = async () => {
-  // We will hit a backend /logout endpoint later to run res.clearCookie()
-  // await fetch(`${API_URL}/auth/logout`, { method: 'POST', credentials: 'include' });
+  await fetch(`${API_URL}/auth/logout`, { method: 'POST', credentials: 'include' });
 };

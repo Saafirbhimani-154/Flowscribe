@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
-import { register, login } from './auth.controller';
+import { register, login, logout } from './auth.controller';
 import { authValidators } from './auth.validators';
 import { checkSlugAvailability } from '../user-profile/user-profile.controller';
 import { userProfileValidators } from '../user-profile/user-profile.validators';
@@ -18,6 +18,7 @@ const router: Router = Router();
 
 router.post('/register', authRateLimit, authValidators.register, register);
 router.post('/login', authRateLimit, authValidators.login, login);
+router.post('/logout', logout);
 
 // Public slug availability check (used by frontend slug setup page)
 router.get('/check-slug/:slugId', userProfileValidators.checkSlug, checkSlugAvailability);

@@ -156,3 +156,13 @@ export const login = async (req: Request, res: Response) => {
     return res.status(500).json({ error: AUTH_MESSAGES.ERROR.INTERNAL_SERVER_ERROR });
   }
 };
+
+// ─── POST /auth/logout ────────────────────────────────────────────────────────
+export const logout = async (req: Request, res: Response) => {
+  res.clearCookie('flowscribe_token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+  });
+  return res.status(200).json({ message: 'Logged out successfully.' });
+};
