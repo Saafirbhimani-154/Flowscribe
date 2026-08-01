@@ -14,7 +14,8 @@ export default function LoginPage() {
     setIsLoading(true);
     setError(null);
     try {
-      await loginService(values);
+      const data = await loginService(values);
+      localStorage.setItem('flowscribe_role', data.role.name);
       navigate('/dashboard');
     } catch (err: any) {
       setError(err.message || 'An error occurred during login.');

@@ -8,8 +8,10 @@ import FeaturesPage from '../pages/Features/Features-page';
 import PrivacyPage from '../pages/Legal/Privacy-page';
 import TermsPage from '../pages/Legal/Terms-page';
 import FaqPage from '../pages/Faq/Faq-page';
+import DashboardRouter from '../pages/Dashboard/DashboardRouter';
+import LogoutPage from '../pages/Auth/Logout-page';
 import { MagneticDock } from '../utils/ui/MagneticDock';
-import { Home, Info, Mail, LogIn, FileText, Shield, Zap, HelpCircle } from 'lucide-react';
+import { Home, Info, Mail, LogIn, LogOut, FileText, Shield, Zap, HelpCircle } from 'lucide-react';
 
 export function AppRoutes() {
   const dockItems = [
@@ -27,6 +29,7 @@ export function AppRoutes() {
     { title: 'Separator 3', isSeparator: true },
     
     { title: 'Login', icon: LogIn, href: '/login' },
+    { title: 'Logout', icon: LogOut, href: '/logout' },
   ];
 
   return (
@@ -39,6 +42,8 @@ export function AppRoutes() {
         <Route path="/features" element={<FeaturesPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/logout" element={<LogoutPage />} />
+        <Route path="/dashboard" element={<DashboardRouter />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/faq" element={<FaqPage />} />
