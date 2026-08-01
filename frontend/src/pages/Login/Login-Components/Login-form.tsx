@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Lock, ArrowRight } from 'lucide-react';
-import type { LoginFormProps } from './Login-interface';
+import type { LoginFormProps } from '../Login-interface';
 import NeumorphicInput from '../../../utils/ui/NeumorphicInput';
 import { useFormValidation, type ValidationSchema } from '../../../hooks/useFormValidation';
 import { emailValidationRules } from '../../../utils/validation/emailValidation';
@@ -23,8 +23,7 @@ export default function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (validateAll()) {
-      onSubmit(e);
-      // Can pass values up to parent if needed: onSubmit(values)
+      onSubmit(values);
     }
   };
 

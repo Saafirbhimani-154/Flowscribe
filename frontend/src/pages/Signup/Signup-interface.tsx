@@ -1,4 +1,4 @@
 export interface SignupFormProps {
-  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  onSubmit: (values: any) => void;
   isLoading?: boolean;
 }
