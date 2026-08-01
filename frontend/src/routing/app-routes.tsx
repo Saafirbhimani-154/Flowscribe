@@ -9,17 +9,23 @@ import PrivacyPage from '../pages/Legal/Privacy-page';
 import TermsPage from '../pages/Legal/Terms-page';
 import FaqPage from '../pages/Faq/Faq-page';
 import DashboardRouter from '../pages/Dashboard/DashboardRouter';
-import OwnerSettingsPage from '../pages/Dashboard/OwnerSettings-page';
 import OwnerMainPage from '../pages/Dashboard/OwnerMain-page';
 import LogoutPage from '../pages/Auth/Logout-page';
 import SetSlugPage from '../pages/Onboarding/SetSlug-page';
+
+// New Settings Imports
+import SettingsLayout from '../pages/Settings/SettingsLayout';
+import SettingsProfile from '../pages/Settings/SettingsProfile';
+import SettingsPassword from '../pages/Settings/SettingsPassword';
+import SettingsLanguage from '../pages/Settings/SettingsLanguage';
+
 import { MagneticDock } from '../utils/ui/MagneticDock';
 import { Home, Info, Mail, LogIn, LogOut, FileText, Shield, Zap, HelpCircle, Settings, Layout } from 'lucide-react';
 
 function MainLayout() {
   const location = useLocation();
   const isUserArea = location.pathname.endsWith('/dashboard') || 
-                    location.pathname.endsWith('/settings') || 
+                    location.pathname.includes('/settings') || 
                     location.pathname.endsWith('/main') || 
                     location.pathname === '/setup-workspace';
   const userSlug = localStorage.getItem('flowscribe_slug') || 'dashboard';
@@ -45,7 +51,7 @@ function MainLayout() {
   const userDock = [
     { title: 'Dashboard', icon: Home, href: `/${userSlug}/dashboard` },
     ...(role !== 'Super Admin' ? [{ title: 'Main App', icon: Layout, href: `/${userSlug}/main` }] : []),
-    { title: 'Settings', icon: Settings, href: `/${userSlug}/settings` },
+    { title: 'Settings', icon: Settings, href: `/${userSlug}/settings/profile` },
     { title: 'Separator 1', isSeparator: true },
     { title: 'Logout', icon: LogOut, href: '/logout' },
   ];
@@ -62,8 +68,16 @@ function MainLayout() {
         <Route path="/setup-workspace" element={<SetSlugPage />} />
         <Route path="/logout" element={<LogoutPage />} />
         <Route path="/:slug/dashboard" element={<DashboardRouter />} />
-        <Route path="/:slug/settings" element={<OwnerSettingsPage />} />
         <Route path="/:slug/main" element={<OwnerMainPage />} />
+        
+        {/* Nested Settings Routes */}
+        <Route path="/:slug/settings" element={<SettingsLayout />}>
+          <Route index element={<Navigate to="profile" replace />} />
+          <Route path="profile" element={<SettingsProfile />} />
+          <Route path="password" element={<SettingsPassword />} />
+          <Route path="language" element={<SettingsLanguage />} />
+        </Route>
+
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/faq" element={<FaqPage />} />

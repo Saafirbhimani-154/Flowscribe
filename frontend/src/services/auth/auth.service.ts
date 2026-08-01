@@ -1,6 +1,6 @@
 import type { LoginCredentials, RegisterCredentials, AuthResponse } from './auth.types';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:6001/api/v1';
 
 export const loginService = async (credentials: LoginCredentials): Promise<AuthResponse> => {
   const res = await fetch(`${API_URL}/auth/login`, {

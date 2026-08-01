@@ -9,6 +9,16 @@
   /* Fonts */
   --font-sans: 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-open-sans: 'Open Sans', system-ui, sans-serif;
+  --font-domine: 'Domine', serif;
+
+  /* Brand Colors (Terra-cotta Theme) */
+  --color-brand-primary: #90370D;
+  --color-brand-secondary: #F1D6C8;
+  --color-brand-bg: #F8F9FA;
+  --color-brand-surface: #FFFFFF;
+  --color-brand-text: #1F2937;
+  --color-brand-muted: #6B7280;
 
   /* Custom Colors: Glass & Accents */
   --color-glass-base: rgba(255, 255, 255, 0.05);
