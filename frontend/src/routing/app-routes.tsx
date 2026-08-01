@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import LandingPage from '../pages/Landing/Landing-page';
 import LoginPage from '../pages/Login/Login-page';
 import AboutPage from '../pages/About/About-page';
@@ -13,8 +13,11 @@ import LogoutPage from '../pages/Auth/Logout-page';
 import { MagneticDock } from '../utils/ui/MagneticDock';
 import { Home, Info, Mail, LogIn, LogOut, FileText, Shield, Zap, HelpCircle } from 'lucide-react';
 
-export function AppRoutes() {
-  const dockItems = [
+function MainLayout() {
+  const location = useLocation();
+  const isDashboard = location.pathname.startsWith('/dashboard');
+
+  const publicDock = [
     { title: 'Home', icon: Home, href: '/' },
     { title: 'Separator 1', isSeparator: true },
     
@@ -29,13 +32,17 @@ export function AppRoutes() {
     { title: 'Separator 3', isSeparator: true },
     
     { title: 'Login', icon: LogIn, href: '/login' },
+  ];
+
+  const userDock = [
+    { title: 'Dashboard', icon: Home, href: '/dashboard' },
+    { title: 'Separator 1', isSeparator: true },
     { title: 'Logout', icon: LogOut, href: '/logout' },
   ];
 
   return (
-    <Router>
-      <div className="relative min-h-screen bg-zinc-950">
-        <Routes>
+    <div className="relative min-h-screen bg-zinc-950">
+      <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/contact" element={<ContactPage />} />
@@ -49,13 +56,19 @@ export function AppRoutes() {
         <Route path="/faq" element={<FaqPage />} />
         
         {/* Fallback route */}
-        {/* Fallback route */}
         <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-        
-        {/* Global OS-Style Dock */}
-        <MagneticDock items={dockItems} />
-      </div>
+      </Routes>
+      
+      {/* Global OS-Style Dock - changes based on route */}
+      <MagneticDock items={isDashboard ? userDock : publicDock} />
+    </div>
+  );
+}
+
+export function AppRoutes() {
+  return (
+    <Router>
+      <MainLayout />
     </Router>
   );
 }

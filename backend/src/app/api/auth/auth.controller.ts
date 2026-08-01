@@ -147,7 +147,7 @@ export const login = async (req: Request, res: Response) => {
         name: user.role?.name || 'Workspace Owner',
       },
       slug: {
-        id: user.slugId,
+        name: user.slugId,
         isSet: user.isSlugSet,
       }
     });
