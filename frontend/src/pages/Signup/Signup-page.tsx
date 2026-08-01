@@ -26,8 +26,15 @@ export default function SignupPage() {
         password: values.password as string,
         confirmPassword: values.confirmPassword as string
       };
-      await registerService(payload);
-      navigate('/dashboard');
+      const data = await registerService(payload);
+      localStorage.setItem('flowscribe_role', data.role.name);
+      localStorage.setItem('flowscribe_slug', data.slug.name);
+      
+      if (!data.slug.isSet) {
+        navigate('/setup-workspace');
+      } else {
+        navigate(`/${data.slug.name}/dashboard`);
+      }
     } catch (err: any) {
       setError(err.message || 'An error occurred during registration.');
     } finally {

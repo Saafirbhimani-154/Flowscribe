@@ -16,7 +16,13 @@ export default function LoginPage() {
     try {
       const data = await loginService(values);
       localStorage.setItem('flowscribe_role', data.role.name);
-      navigate('/dashboard');
+      localStorage.setItem('flowscribe_slug', data.slug.name);
+      
+      if (!data.slug.isSet) {
+        navigate('/setup-workspace');
+      } else {
+        navigate(`/${data.slug.name}/dashboard`);
+      }
     } catch (err: any) {
       setError(err.message || 'An error occurred during login.');
     } finally {

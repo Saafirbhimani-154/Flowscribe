@@ -19,7 +19,7 @@ export function useFormValidation<T extends Record<string, string>>(
   const [touched, setTouched] = useState<Partial<Record<keyof T, boolean>>>({});
   const [isValid, setIsValid] = useState(false);
 
-  const validateField = useCallback((name: keyof T, value: string) => {
+  const validateField = useCallback((name: keyof T, value: string, currentValues: T) => {
     const rules = schema[name];
     if (!rules) return '';
 
@@ -27,7 +27,7 @@ export function useFormValidation<T extends Record<string, string>>(
       if (rule.pattern && !rule.pattern.test(value)) {
         return rule.message;
       }
-      if (rule.validate && !rule.validate(value, values)) {
+      if (rule.validate && !rule.validate(value, currentValues)) {
         return rule.message;
       }
     }
@@ -36,34 +36,45 @@ export function useFormValidation<T extends Record<string, string>>(
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    
     setValues(prev => ({ ...prev, [name]: value }));
     setTouched(prev => ({ ...prev, [name]: true }));
-
-    // Re-validate field on change if it has been touched
-    const errorMsg = validateField(name as keyof T, value);
-    setErrors(prev => ({ ...prev, [name]: errorMsg }));
   };
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+    const { name } = e.target;
     setTouched(prev => ({ ...prev, [name]: true }));
-    const errorMsg = validateField(name as keyof T, value);
-    setErrors(prev => ({ ...prev, [name]: errorMsg }));
   };
 
-  // Re-calculate overall form validity whenever values or schema change
+  // Re-calculate overall form validity and field errors whenever values change
   useEffect(() => {
     let formIsValid = true;
+    
+    // Check form validity
     for (const key in schema) {
-      const errorMsg = validateField(key, values[key]);
-      if (errorMsg) {
+      if (validateField(key, values[key], values)) {
         formIsValid = false;
         break;
       }
     }
     setIsValid(formIsValid);
-  }, [values, schema, validateField]);
+
+    // Update errors for ALL touched fields
+    setErrors(prevErrors => {
+      let hasChanges = false;
+      const nextErrors = { ...prevErrors };
+      
+      for (const key in schema) {
+        if (touched[key]) {
+          const errorMsg = validateField(key, values[key], values);
+          if (nextErrors[key] !== errorMsg) {
+            nextErrors[key] = errorMsg;
+            hasChanges = true;
+          }
+        }
+      }
+      return hasChanges ? nextErrors : prevErrors;
+    });
+  }, [values, touched, schema, validateField]);
 
   // A method to trigger validation on all fields (useful before submit)
   const validateAll = () => {
@@ -71,7 +82,7 @@ export function useFormValidation<T extends Record<string, string>>(
     let formIsValid = true;
 
     for (const key in schema) {
-      const errorMsg = validateField(key, values[key]);
+      const errorMsg = validateField(key, values[key], values);
       if (errorMsg) {
         newErrors[key] = errorMsg;
         formIsValid = false;
