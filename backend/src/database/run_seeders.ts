@@ -24,7 +24,10 @@ async function runSeeders() {
         
         try {
           // Dynamic import for TS/JS module
-          const seederModule = await import(filePath);
+          // Convert path to file:// URL for cross-platform compatibility (especially Windows)
+          const { pathToFileURL } = require('url');
+          const fileUrl = pathToFileURL(filePath).href;
+          const seederModule = await import(fileUrl);
           if (typeof seederModule.default === 'function') {
             await seederModule.default();
           } else {

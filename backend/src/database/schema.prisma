@@ -12,23 +12,36 @@ model Role {
   id          String  @id @default(uuid())
   name        String  @unique
   description String?
-  // Prisma requires this back-relation line to link User -> Role, but it does NOT create a column in the DB!
+  // Prisma requires this back-relation line to link User -> Role, but does NOT create a column in DB
   users       User[]  
 }
 
 model User {
-  id        String    @id @default(uuid())
-  firstName String
-  lastName  String
-  email     String    @unique
-  password  String
-  slugId    String    @unique
-  roleId    String
-  role      Role      @relation(fields: [roleId], references: [id])
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
+  id          String       @id @default(uuid())
+  firstName   String
+  lastName    String
+  email       String       @unique
+  password    String
+  slugId      String       @unique
+  isSlugSet   Boolean      @default(false)
+  roleId      String
+  role        Role         @relation(fields: [roleId], references: [id])
+  profile     UserProfile?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  deletedAt   DateTime?
 
   @@index([email])
   @@index([slugId])
+}
+
+model UserProfile {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  language  String   @default("en")
+  theme     String   @default("system")
+  timezone  String   @default("UTC")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

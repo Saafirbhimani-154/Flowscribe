@@ -18,5 +18,6 @@ CREATE TABLE IF NOT EXISTS "User" (
 CREATE UNIQUE INDEX IF NOT EXISTS "User_email_key" ON "User"("email");
 CREATE UNIQUE INDEX IF NOT EXISTS "User_slugId_key" ON "User"("slugId");
 
--- Add Foreign Key
+-- Add Foreign Key (idempotent)
+ALTER TABLE "User" DROP CONSTRAINT IF EXISTS "User_roleId_fkey";
 ALTER TABLE "User" ADD CONSTRAINT "User_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
