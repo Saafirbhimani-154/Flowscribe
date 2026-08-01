@@ -9,9 +9,8 @@ Teams building real-world operational systems almost always start the same way: 
 Flowscribe takes photos of a hand-drawn process flow and turns them into a validated, formally-modeled system blueprint. 
 It generates the standard system-design diagram set (Activity, State Machine, Use Case, and Data Flow Diagrams), while auditing the original flow for logical gaps, contradictions, and missing edge cases.
 
-## Tech Stack (3-Tier Architecture)
+## Tech Stack (2-Tier Architecture)
 - **Frontend:** React + Vite + TypeScript + TailwindCSS + beautiful Skeleton Loaders for UX (Port 7000)
-- **Middleware:** Next.js + TypeScript BFF (Port 6001)
 - **Backend:** Node.js + Express + TypeScript (Port 5000)
 - **Database / ORM:** PostgreSQL (Docker) + Prisma
 - **Caching/Queueing:** Redis + BullMQ (for handling multiple users calling the LLM)
@@ -41,15 +40,7 @@ frontend/
 └── package.json
 ```
 
-### 2. Middleware Architecture
-```text
-middleware/
-├── src/
-│   └── app/          # Next.js App Router structure (layout, pages)
-└── package.json
-```
-
-### 3. Backend Architecture
+### 2. Backend Architecture
 ```text
 backend/
 ├── src/
@@ -76,7 +67,7 @@ The core architecture and business logic have been fully defined by autonomous a
 This project is configured as a highly-decoupled monorepo using `pnpm` workspaces. You have two ways to start the project locally:
 
 ### Option 1: Docker Compose (Recommended)
-This method spins up the frontend, middleware, backend, and PostgreSQL database automatically in isolated containers.
+This method spins up the frontend, backend, and PostgreSQL database automatically in isolated containers.
 
 1. **Install dependencies across the monorepo:**
    ```bash
@@ -97,7 +88,7 @@ If you prefer to run the Node servers natively on your machine (you still need t
    ```bash
    docker-compose -f docker-compose.local.yml up -d db
    ```
-2. Run the concurrent dev script from the root (starts Vite, Next.js, and Express simultaneously):
+2. Run the concurrent dev script from the root (starts Vite and Express simultaneously):
    ```bash
    pnpm run dev
    ```
