@@ -27,6 +27,7 @@ model User {
   roleId      String
   role        Role         @relation(fields: [roleId], references: [id])
   profile     UserProfile?
+  promptUsages PromptUsage[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   deletedAt   DateTime?
@@ -53,4 +54,16 @@ model ContactMessage {
   message   String   @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model PromptUsage {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  date      DateTime @db.Date
+  count     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, date])
 }

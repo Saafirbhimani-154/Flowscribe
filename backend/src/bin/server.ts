@@ -23,7 +23,7 @@ app.use(helmet());
 app.use(express.json({ limit: '10kb' }));
 app.use(cookieParser());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:7000',
+  origin: [process.env.FRONTEND_URL || 'http://localhost:7000', 'http://127.0.0.1:7000'],
   credentials: true
 }));
 

@@ -12,6 +12,8 @@ import OwnerMainPage from '../pages/Dashboard/OwnerMain-page';
 import LogoutPage from '../pages/Auth/Logout-page';
 import SetSlugPage from '../pages/Onboarding/SetSlug-page';
 
+import FlowBuilderPage from '../pages/FlowBuilder/FlowBuilder-page';
+
 // New Settings Imports
 import SettingsLayout from '../pages/Settings/SettingsLayout';
 import SettingsProfile from '../pages/Settings/tabs/SettingsProfile';
@@ -26,7 +28,8 @@ function MainLayout() {
   const isUserArea = location.pathname.endsWith('/dashboard') || 
                     location.pathname.includes('/settings') || 
                     location.pathname.endsWith('/main') || 
-                    location.pathname === '/setup-workspace';
+                    location.pathname === '/setup-workspace' ||
+                    location.pathname.endsWith('/flow-builder');
   const userSlug = localStorage.getItem('flowscribe_slug') || 'dashboard';
   const role = localStorage.getItem('flowscribe_role');
 
@@ -48,7 +51,7 @@ function MainLayout() {
 
   const userDock = [
     { title: 'Dashboard', icon: Home, href: `/${userSlug}/dashboard` },
-    ...(role !== 'Super Admin' ? [{ title: 'Main App', icon: Layout, href: `/${userSlug}/main` }] : []),
+    { title: 'Flow Builder', icon: FileText, href: `/${userSlug}/flow-builder` },
     { title: 'Settings', icon: Settings, href: `/${userSlug}/settings/profile` },
     { title: 'Separator 1', isSeparator: true },
     { title: 'Logout', icon: LogOut, href: '/logout' },
@@ -66,6 +69,7 @@ function MainLayout() {
         <Route path="/logout" element={<LogoutPage />} />
         <Route path="/:slug/dashboard" element={<DashboardRouter />} />
         <Route path="/:slug/main" element={<OwnerMainPage />} />
+        <Route path="/:slug/flow-builder" element={<FlowBuilderPage />} />
         
         {/* Nested Settings Routes */}
         <Route path="/:slug/settings" element={<SettingsLayout />}>
