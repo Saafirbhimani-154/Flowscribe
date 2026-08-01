@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { authRoutes } from './api/auth';
+import { userProfileRoutes } from './api/user-profile';
 import { authMiddleware } from './middlewares/auth.middleware';
 
 const router: Router = Router();
@@ -8,10 +9,7 @@ const router: Router = Router();
 router.use('/v1/auth', authRoutes);
 
 // ─── Protected routes (authMiddleware required) ───────────────────────────────
-// Pattern: router.use('/v1/resource', authMiddleware, resourceRoutes);
-// Example once dashboard/workspace routes are added:
-//   import { workspaceRoutes } from './api/workspace';
-//   router.use('/v1/workspace', authMiddleware, workspaceRoutes);
+router.use('/v1/user-profile', authMiddleware, userProfileRoutes);
 
 // Export for server.ts
 export default router;

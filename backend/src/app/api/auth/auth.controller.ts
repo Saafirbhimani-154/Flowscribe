@@ -94,13 +94,21 @@ export const register = async (req: Request, res: Response) => {
     // B-1: Do NOT return the token in the body — it lives only in the HTTP-only cookie
     return res.status(201).json({
       message: (existingUser) ? AUTH_MESSAGES.SUCCESS.RESTORED : AUTH_MESSAGES.SUCCESS.REGISTERED,
-      user: {
+      auth: {
         id: user.id,
+        email: user.email,
+      },
+      userProfile: {
         firstName: user.firstName,
         lastName: user.lastName,
-        email: user.email,
-        slugId: user.slugId,
-        roleId: user.roleId
+      },
+      role: {
+        id: user.roleId,
+        name: user.role?.name || 'Workspace Owner',
+      },
+      slug: {
+        name: user.slugId,
+        isSet: user.isSlugSet,
       }
     });
   } catch (error) {
@@ -126,13 +134,21 @@ export const login = async (req: Request, res: Response) => {
     // B-1: Do NOT return the token in the body — it lives only in the HTTP-only cookie
     return res.status(200).json({
       message: AUTH_MESSAGES.SUCCESS.LOGGED_IN,
-      user: {
+      auth: {
         id: user.id,
+        email: user.email,
+      },
+      userProfile: {
         firstName: user.firstName,
         lastName: user.lastName,
-        email: user.email,
-        slugId: user.slugId,
-        roleId: user.roleId
+      },
+      role: {
+        id: user.roleId,
+        name: user.role?.name || 'Workspace Owner',
+      },
+      slug: {
+        id: user.slugId,
+        isSet: user.isSlugSet,
       }
     });
   } catch (error) {
