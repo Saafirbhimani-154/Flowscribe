@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import ProfileForm from './components/ProfileForm';
-import DangerZone from './components/DangerZone';
+import ProfileForm from '../components/ProfileForm';
+import DangerZone from '../components/DangerZone';
 
 export default function SettingsProfile() {
   const { slug } = useParams<{ slug: string }>();

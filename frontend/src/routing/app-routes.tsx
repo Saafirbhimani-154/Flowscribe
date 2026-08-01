@@ -15,9 +15,9 @@ import SetSlugPage from '../pages/Onboarding/SetSlug-page';
 
 // New Settings Imports
 import SettingsLayout from '../pages/Settings/SettingsLayout';
-import SettingsProfile from '../pages/Settings/SettingsProfile';
-import SettingsPassword from '../pages/Settings/SettingsPassword';
-import SettingsLanguage from '../pages/Settings/SettingsLanguage';
+import SettingsProfile from '../pages/Settings/tabs/SettingsProfile';
+import SettingsPassword from '../pages/Settings/tabs/SettingsPassword';
+import SettingsLanguage from '../pages/Settings/tabs/SettingsLanguage';
 
 import { MagneticDock } from '../utils/ui/MagneticDock';
 import { Home, Info, Mail, LogIn, LogOut, FileText, Shield, Zap, HelpCircle, Settings, Layout } from 'lucide-react';

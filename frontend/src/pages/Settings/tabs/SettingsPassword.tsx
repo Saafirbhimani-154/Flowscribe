@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import PasswordForm from './components/PasswordForm';
+import PasswordForm from '../components/PasswordForm';
 
 export default function SettingsPassword() {
   const { slug } = useParams<{ slug: string }>();

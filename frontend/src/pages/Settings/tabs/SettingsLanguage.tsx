@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import PreferencesForm from './components/PreferencesForm';
+import PreferencesForm from '../components/PreferencesForm';
 
 export default function SettingsLanguage() {
   const { slug } = useParams<{ slug: string }>();
