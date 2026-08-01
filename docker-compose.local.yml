@@ -16,27 +16,6 @@ services:
       - PORT=7000
       - CHOKIDAR_USEPOLLING=true
     command: npm run dev -- --host --port 7000
-    depends_on:
-      - middleware
-
-  middleware:
-    env_file: .env.local
-    build:
-      context: ./middleware
-      dockerfile: Dockerfile
-    ports:
-      - '6001:6001'
-    volumes:
-      - ./middleware:/app
-      - /app/node_modules
-      - /app/.next
-    environment:
-      - NODE_ENV=development
-      - PORT=6001
-      - WATCHPACK_POLLING=true
-    command: sh -c "npm i @next/swc-linux-x64-gnu@16.2.12 && npm run dev"
-    depends_on:
-      - backend
 
   backend:
     env_file: ./backend/.env.local

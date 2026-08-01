@@ -1,6 +1,6 @@
 import { AlertTriangle } from 'lucide-react';
 
-export default function DangerZone({ slug }: { slug: string }) {
+export default function DangerZone() {
   return (
     <div className="mt-16 pt-8 border-t border-brand-secondary/30">
       <h3 className="text-xl font-domine font-bold text-red-600 mb-2 flex items-center gap-2">

@@ -14,7 +14,7 @@ export default function SettingsProfile() {
       </div>
 
       <ProfileForm slug={slug || ''} />
-      <DangerZone slug={slug || ''} />
+      <DangerZone />
     </motion.div>
   );
 }
