@@ -25,15 +25,7 @@ You will be provided with a finalized process flow and must generate valid diagr
     "stateMachine": "stateDiagram-v2\n  [*] --> OpenLogin\n  OpenLogin --> EnterEmail\n  EnterEmail --> EnterPassword\n  EnterPassword --> Login : submit\n  Login --> Dashboard : success\n  Login --> EnterEmail : failure\n  Dashboard --> [*]"
   },
   "schema": {
-    "tables": [
-      {
-        "name": "User",
-        "fields": [
-          { "name": "id", "type": "String" },
-          { "name": "email", "type": "String" }
-        ]
-      }
-    ]
+    "sql": "CREATE TABLE users (\n  id UUID PRIMARY KEY,\n  email VARCHAR(255) UNIQUE NOT NULL\n);"
   }
 }
 

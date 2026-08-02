@@ -21,7 +21,7 @@ export interface SaveResultRequest {
     edgeCases: any[];
   };
   schema: {
-    tables: any[];
+    sql: string;
   };
 }
 

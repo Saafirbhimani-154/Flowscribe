@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import mermaid from 'mermaid';
 import { History, Plus, Trash2 } from 'lucide-react';
 import type { FlowBuilderStep, SessionData, Diagrams, AuditData, SchemaData } from '../../types/flows.types';
@@ -83,9 +83,14 @@ export default function FlowBuilderPage() {
     setDroppedCount(0);
   };
 
+  const isAnalyzing = useRef(false);
+
   // ── Analysis ───────────────────────────────────────────────────
   const handleAnalyze = async () => {
     if (files.length === 0 && (!context || context.trim() === '')) return;
+    if (isAnalyzing.current) return;
+    isAnalyzing.current = true;
+    
     setLoading(true);
     setError(null);
 
@@ -114,6 +119,7 @@ export default function FlowBuilderPage() {
       setError(err.message);
     } finally {
       setLoading(false);
+      isAnalyzing.current = false;
     }
   };
 
@@ -165,40 +171,56 @@ export default function FlowBuilderPage() {
       </div>
 
       <div className="flex-1 overflow-y-auto p-2 space-y-1">
-        {/* Active session indicator */}
-        {activeSessionId && (
-          <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 cursor-pointer text-xs leading-snug">
-            <div className="font-semibold mb-0.5">Current Session</div>
-            <div className="text-blue-300/60 truncate">Flow analyzed just now</div>
-          </div>
-        )}
-
-        {/* Past sessions */}
-        {sessions.filter(s => s.id !== activeSessionId).map((session) => (
-          <div
-            key={session.id}
-            className="group p-3 rounded-lg text-zinc-500 hover:bg-zinc-800/60 cursor-pointer text-xs leading-snug transition flex items-start justify-between"
-          >
-            <div>
-              <div className="font-medium text-zinc-400 truncate max-w-[148px]">{session.title}</div>
-              <div className="text-zinc-600 mt-0.5">
-                {new Date(session.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
-                {' · '}{session._count.messages} msg{session._count.messages !== 1 ? 's' : ''}
-              </div>
-            </div>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                sessionsService.deleteSession(session.id).then(() =>
-                  setSessions(prev => prev.filter(s => s.id !== session.id))
-                );
+        {sessions.map((session) => {
+          const isActive = session.id === activeSessionId;
+          return (
+            <div
+              key={session.id}
+              onClick={async () => {
+                try {
+                  const detail = await sessionsService.getSession(session.id);
+                  setActiveSessionId(detail.id);
+                  if (detail.result) {
+                    setDiagrams(detail.result.diagrams as any);
+                    setAudit(detail.result.audit as any);
+                    setSchema(detail.result.schema as any);
+                    setStep('RESULTS');
+                  } else {
+                    setStep('RESULTS');
+                  }
+                } catch (err) {
+                  console.warn('Failed to load session:', err);
+                }
               }}
-              className="opacity-0 group-hover:opacity-100 text-zinc-600 hover:text-red-400 transition mt-0.5 shrink-0"
+              className={`group p-3 rounded-lg cursor-pointer text-xs leading-snug transition flex items-start justify-between ${
+                isActive
+                  ? 'bg-blue-500/10 border border-blue-500/20 text-blue-400'
+                  : 'text-zinc-500 hover:bg-zinc-800/60'
+              }`}
             >
-              <Trash2 className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        ))}
+              <div className="min-w-0">
+                <div className={`font-medium truncate max-w-[148px] ${isActive ? 'text-blue-400' : 'text-zinc-400'}`}>
+                  {session.title}
+                </div>
+                <div className={isActive ? 'text-blue-300/60 mt-0.5' : 'text-zinc-600 mt-0.5'}>
+                  {new Date(session.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
+                  {' · '}{session._count?.messages || 0} msg{(session._count?.messages || 0) !== 1 ? 's' : ''}
+                </div>
+              </div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  sessionsService.deleteSession(session.id).then(() =>
+                    setSessions(prev => prev.filter(s => s.id !== session.id))
+                  );
+                }}
+                className="opacity-0 group-hover:opacity-100 text-zinc-600 hover:text-red-400 transition mt-0.5 shrink-0"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          );
+        })}
 
         {sessions.length === 0 && !activeSessionId && (
           <div className="text-zinc-600 text-xs p-3 italic">No past sessions yet.</div>

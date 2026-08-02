@@ -15,7 +15,7 @@ export interface SessionDetail {
   result: {
     diagrams: { activity: string; stateMachine: string };
     audit: { gaps: any[]; edgeCases: any[] };
-    schema: { tables: any[] };
+    schema: { sql: string };
   } | null;
   messages: SessionMessage[];
 }
@@ -36,5 +36,5 @@ export interface CreateSessionPayload {
 export interface SaveResultPayload {
   diagrams: { activity: string; stateMachine: string };
   audit: { gaps: any[]; edgeCases: any[] };
-  schema: { tables: any[] };
+  schema: { sql: string };
 }

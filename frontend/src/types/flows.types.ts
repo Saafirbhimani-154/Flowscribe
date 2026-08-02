@@ -21,7 +21,7 @@ export interface AuditData {
 }
 
 export interface SchemaData {
-  tables: any[];
+  sql: string;
 }
 
 export interface Diagrams {

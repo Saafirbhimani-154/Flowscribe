@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { AlertTriangle, FileJson, Send, History, FileText, Plus, Trash2 } from 'lucide-react';
+import { AlertTriangle, FileJson, Send, History, FileText, Plus, Trash2, LayoutTemplate, Activity } from 'lucide-react';
 import mermaid from 'mermaid';
 import type { Diagrams, AuditData, SchemaData } from '../../../types/flows.types';
 import { sessionsService } from '../../../services/sessions/sessions.service';
-import type { SessionSummary } from '../../../services/sessions/sessions.types';
+import type { SessionSummary, SessionDetail } from '../../../services/sessions/sessions.types';
 
 
 interface ResultScreenProps {
@@ -22,31 +22,55 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({ diagrams, audit, sch
   const mermaidRef = useRef<HTMLPreElement>(null);
   const [chatMessage, setChatMessage] = useState('');
   const [mermaidError, setMermaidError] = useState<string | null>(null);
-  const [middleTab, setMiddleTab] = useState<'ACTIVITY' | 'STATE'>('ACTIVITY');
-  const [rightTab, setRightTab] = useState<'AUDIT' | 'SCHEMA'>('AUDIT');
+  const [diagramMode, setDiagramMode] = useState<'PREVIEW' | 'RAW'>('PREVIEW');
+  const [rightTab, setRightTab] = useState<'ACTIVITY' | 'STATE' | 'AUDIT' | 'SCHEMA'>('ACTIVITY');
   const [sessions, setSessions] = useState<SessionSummary[]>([]);
+  const [sessionDetail, setSessionDetail] = useState<SessionDetail | null>(null);
   const [sendingMessage, setSendingMessage] = useState(false);
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
   // Fetch real session history
   useEffect(() => {
     sessionsService.listSessions()
       .then(setSessions)
       .catch(() => setSessions([]));
-  }, [activeSessionId]); // refresh when a new session is created
+  }, [activeSessionId]);
+
+  const fetchSessionDetails = async () => {
+    if (activeSessionId) {
+      try {
+        const detail = await sessionsService.getSession(activeSessionId);
+        setSessionDetail(detail);
+      } catch (err) {
+        console.warn('Failed to load session details', err);
+      }
+    }
+  };
 
   useEffect(() => {
-    mermaid.initialize({ startOnLoad: false, theme: 'dark', suppressErrorRendering: true });
-    setMermaidError(null);
-    // Only run mermaid if the ref exists and the chart has content
-    const currentChart = middleTab === 'ACTIVITY' ? diagrams?.activity : diagrams?.stateMachine;
-    if (mermaidRef.current && currentChart && currentChart.trim().length > 0) {
-      mermaidRef.current.removeAttribute('data-processed');
-      mermaid.run({ nodes: [mermaidRef.current] }).catch((err: Error) => {
-        console.warn('[Mermaid] Syntax error in diagram:', err.message);
-        setMermaidError(err.message || 'Diagram contains invalid syntax.');
-      });
+    fetchSessionDetails();
+  }, [activeSessionId]);
+
+  useEffect(() => {
+    // Scroll to bottom on new messages
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [sessionDetail?.messages]);
+
+  useEffect(() => {
+    if (rightTab === 'ACTIVITY' || rightTab === 'STATE') {
+      mermaid.initialize({ startOnLoad: false, theme: 'dark', suppressErrorRendering: true });
+      setMermaidError(null);
+      // Only run mermaid if the ref exists and the chart has content
+      const currentChart = rightTab === 'ACTIVITY' ? diagrams?.activity : diagrams?.stateMachine;
+      if (mermaidRef.current && currentChart && currentChart.trim().length > 0) {
+        mermaidRef.current.removeAttribute('data-processed');
+        mermaid.run({ nodes: [mermaidRef.current] }).catch((err: Error) => {
+          console.warn('[Mermaid] Syntax error in diagram:', err.message);
+          setMermaidError(err.message || 'Diagram contains invalid syntax.');
+        });
+      }
     }
-  }, [middleTab, diagrams]);
+  }, [rightTab, diagrams]);
 
   const renderMermaid = (chart: string | null | undefined) => {
     if (!chart || chart.trim().length === 0) {
@@ -59,6 +83,15 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({ diagrams, audit, sch
         </div>
       );
     }
+
+    if (diagramMode === 'RAW') {
+      return (
+        <div className="w-full h-full bg-zinc-950 p-6 pt-16 overflow-auto">
+          <pre className="text-xs text-blue-400 leading-relaxed font-mono whitespace-pre-wrap">{chart}</pre>
+        </div>
+      );
+    }
+
     return (
       <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-950 p-8 overflow-auto">
         {mermaidError ? (
@@ -72,6 +105,20 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({ diagrams, audit, sch
         )}
       </div>
     );
+  };
+
+  const handleSendMessage = async () => {
+    if (!chatMessage.trim() || !activeSessionId) return;
+    setSendingMessage(true);
+    try {
+      await sessionsService.addMessage(activeSessionId, chatMessage.trim(), 'USER', 'TEXT');
+      setChatMessage('');
+      await fetchSessionDetails();
+    } catch (err) {
+      console.warn(err);
+    } finally {
+      setSendingMessage(false);
+    }
   };
 
   return (
@@ -93,35 +140,47 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({ diagrams, audit, sch
           </div>
 
           <div className="flex-1 overflow-y-auto p-2 space-y-1">
-            <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 cursor-pointer text-xs leading-snug">
-              <div className="font-semibold mb-0.5">Current Session</div>
-              <div className="text-blue-300/60 truncate">Flow analyzed just now</div>
-            </div>
-            {sessions.filter(s => s.id !== activeSessionId).map((session) => (
-              <div
-                key={session.id}
-                className="group p-3 rounded-lg text-zinc-500 hover:bg-zinc-800/60 cursor-pointer text-xs leading-snug transition flex items-start justify-between"
-              >
-                <div>
-                  <div className="font-medium text-zinc-400 truncate max-w-[160px]">{session.title}</div>
-                  <div className="text-zinc-600 mt-0.5">
-                    {new Date(session.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
-                    {' · '}{session._count.messages} msg{session._count.messages !== 1 ? 's' : ''}
-                  </div>
-                </div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    sessionsService.deleteSession(session.id).then(() =>
-                      setSessions(prev => prev.filter(s => s.id !== session.id))
-                    );
+            {sessions.map((session) => {
+              const isActive = session.id === activeSessionId;
+              return (
+                <div
+                  key={session.id}
+                  onClick={async () => {
+                    // Handled in FlowBuilder-page onClick wrapper, but we need to pass the event if it's there?
+                    // Wait, FlowBuilder-page provides the list? No! ResultScreen renders the list!
+                    // Wait! The sidebar is rendered by ResultScreen only if !hideSidebar.
+                    // BUT hideSidebar is TRUE in FlowBuilder-page when step === 'RESULTS'!
+                    // So ResultScreen's sidebar is actually HIDDEN in FlowBuilder-page!
                   }}
-                  className="opacity-0 group-hover:opacity-100 text-zinc-600 hover:text-red-400 transition mt-0.5"
+                  className={`group p-3 rounded-lg cursor-pointer text-xs leading-snug transition flex items-start justify-between ${
+                    isActive 
+                      ? 'bg-blue-500/10 border border-blue-500/20 text-blue-400' 
+                      : 'text-zinc-500 hover:bg-zinc-800/60'
+                  }`}
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            ))}
+                  <div className="min-w-0">
+                    <div className={`font-medium truncate max-w-[148px] ${isActive ? 'text-blue-400' : 'text-zinc-400'}`}>
+                      {session.title}
+                    </div>
+                    <div className={isActive ? 'text-blue-300/60 mt-0.5' : 'text-zinc-600 mt-0.5'}>
+                      {new Date(session.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
+                      {' · '}{session._count?.messages || 0} msg{(session._count?.messages || 0) !== 1 ? 's' : ''}
+                    </div>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      sessionsService.deleteSession(session.id).then(() =>
+                        setSessions(prev => prev.filter(s => s.id !== session.id))
+                      );
+                    }}
+                    className="opacity-0 group-hover:opacity-100 text-zinc-600 hover:text-red-400 transition mt-0.5 shrink-0"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              );
+            })}
             {sessions.length === 0 && (
               <div className="text-zinc-600 text-xs p-3 italic">No past sessions yet.</div>
             )}
@@ -129,58 +188,45 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({ diagrams, audit, sch
         </div>
       )}
 
-      {/* ─── CENTER PANEL: DIAGRAMS + RE-CHAT ────────────────── */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Tab bar */}
-        <div className="flex items-center gap-2 px-3 py-2 border-b border-zinc-800 bg-zinc-900/40">
-          {(['ACTIVITY', 'STATE'] as const).map(tab => (
-            <button
-              key={tab}
-              onClick={() => setMiddleTab(tab)}
-              className={`px-4 py-1.5 rounded-md text-sm font-medium transition ${
-                middleTab === tab
-                  ? 'bg-blue-600 text-white shadow'
-                  : 'text-zinc-400 hover:bg-zinc-800'
-              }`}
-            >
-              {tab === 'ACTIVITY' ? 'Activity Diagram' : 'State Diagram'}
-            </button>
+      {/* ─── CENTER PANEL: CHAT INTERFACE ────────────────── */}
+      <div className="flex-1 flex flex-col min-w-0 bg-zinc-900/20">
+        <div className="flex items-center px-4 py-3 border-b border-zinc-800 bg-zinc-900/40">
+          <span className="font-semibold text-zinc-300">Analysis Chat</span>
+        </div>
+
+        {/* Chat Messages */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-6">
+          {(sessionDetail?.messages || []).map((msg) => (
+            <div key={msg.id} className={`flex ${msg.role === 'USER' ? 'justify-end' : 'justify-start'}`}>
+              <div className={`max-w-2xl rounded-2xl px-5 py-3 ${
+                msg.role === 'USER' 
+                  ? 'bg-blue-600 text-white' 
+                  : 'bg-zinc-800 text-zinc-200 border border-zinc-700'
+              }`}>
+                {msg.type === 'UPLOAD' && <p className="text-sm italic opacity-80 mb-2">Uploaded flow context:</p>}
+                <p className="whitespace-pre-wrap text-sm leading-relaxed">{msg.content}</p>
+              </div>
+            </div>
           ))}
+          <div ref={chatEndRef} />
         </div>
 
-        {/* Diagram area — renderMermaid handles null/empty with a placeholder */}
-        <div className="flex-1 overflow-auto bg-zinc-950">
-          {middleTab === 'ACTIVITY' && renderMermaid(diagrams?.activity)}
-          {middleTab === 'STATE' && renderMermaid(diagrams?.stateMachine)}
-        </div>
-
-        {/* Re-chat input */}
-        <div className="px-4 py-3 border-t border-zinc-800 bg-zinc-900/60 backdrop-blur-sm">
-          <div className="relative max-w-2xl mx-auto">
+        {/* Re-chat input - padded to prevent dock obstruction */}
+        <div className="px-4 pt-3 pb-8 lg:pb-12 border-t border-zinc-800 bg-zinc-900/60 backdrop-blur-sm">
+          <div className="relative max-w-3xl mx-auto">
             <input
               type="text"
               value={chatMessage}
               onChange={e => setChatMessage(e.target.value)}
               onKeyDown={async (e) => {
-                if (e.key === 'Enter' && chatMessage.trim() && activeSessionId) {
-                  setSendingMessage(true);
-                  await sessionsService.addMessage(activeSessionId, chatMessage.trim(), 'USER', 'TEXT').catch(console.warn);
-                  setChatMessage('');
-                  setSendingMessage(false);
-                }
+                if (e.key === 'Enter') await handleSendMessage();
               }}
-              placeholder="Ask a follow-up, e.g. 'Add a Forgot Password branch'..."
-              className="w-full bg-zinc-950 border border-zinc-700 focus:border-blue-500 rounded-full py-3 pl-5 pr-14 text-white text-sm focus:outline-none transition"
+              placeholder="Ask a follow-up or refine the flow..."
+              className="w-full bg-zinc-950 border border-zinc-700 focus:border-blue-500 rounded-full py-3 pl-5 pr-14 text-white text-sm focus:outline-none transition shadow-inner"
             />
             <button
               disabled={!chatMessage.trim() || sendingMessage}
-              onClick={async () => {
-                if (!chatMessage.trim() || !activeSessionId) return;
-                setSendingMessage(true);
-                await sessionsService.addMessage(activeSessionId, chatMessage.trim(), 'USER', 'TEXT').catch(console.warn);
-                setChatMessage('');
-                setSendingMessage(false);
-              }}
+              onClick={handleSendMessage}
               className="absolute right-1.5 top-1.5 bottom-1.5 w-9 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 rounded-full flex items-center justify-center transition"
             >
               <Send className="w-4 h-4 text-white" />
@@ -189,29 +235,61 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({ diagrams, audit, sch
         </div>
       </div>
 
-      {/* ─── RIGHT PANEL: LIVE DOCUMENTATION ─────────────────── */}
-      <div className="w-96 shrink-0 border-l border-zinc-800 bg-zinc-900 flex flex-col">
+      {/* ─── RIGHT PANEL: DIAGRAMS & DOCUMENTATION ─────────────────── */}
+      <div className="w-[450px] shrink-0 border-l border-zinc-800 bg-zinc-900 flex flex-col">
         {/* Tab bar */}
-        <div className="flex items-center gap-1 px-2 py-2 border-b border-zinc-800 bg-zinc-900/40">
-          {(['AUDIT', 'SCHEMA'] as const).map(tab => (
+        <div className="flex items-center px-1 py-1 border-b border-zinc-800 bg-zinc-900/40">
+          {(['ACTIVITY', 'STATE', 'AUDIT', 'SCHEMA'] as const).map(tab => (
             <button
               key={tab}
               onClick={() => setRightTab(tab)}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium transition ${
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-md text-[11px] font-medium transition ${
                 rightTab === tab
-                  ? 'bg-zinc-700 text-white'
+                  ? 'bg-zinc-700 text-white shadow'
                   : 'text-zinc-500 hover:bg-zinc-800'
               }`}
             >
-              {tab === 'AUDIT' ? <FileText className="w-3.5 h-3.5" /> : <FileJson className="w-3.5 h-3.5" />}
-              {tab === 'AUDIT' ? 'Audit Report' : 'Schema'}
+              {tab === 'ACTIVITY' && <Activity className="w-3.5 h-3.5" />}
+              {tab === 'STATE' && <LayoutTemplate className="w-3.5 h-3.5" />}
+              {tab === 'AUDIT' && <FileText className="w-3.5 h-3.5" />}
+              {tab === 'SCHEMA' && <FileJson className="w-3.5 h-3.5" />}
+              {tab === 'ACTIVITY' && 'Activity'}
+              {tab === 'STATE' && 'State'}
+              {tab === 'AUDIT' && 'Audit'}
+              {tab === 'SCHEMA' && 'SQL Schema'}
             </button>
           ))}
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex-1 overflow-y-auto bg-zinc-950 relative">
+          {/* Diagram Toggle */}
+          {(rightTab === 'ACTIVITY' || rightTab === 'STATE') && (
+            <div className="absolute top-4 right-4 z-10 bg-zinc-900 border border-zinc-700 rounded-lg flex overflow-hidden shadow-lg">
+              <button
+                onClick={() => setDiagramMode('PREVIEW')}
+                className={`px-3 py-1.5 text-[11px] font-medium transition ${
+                  diagramMode === 'PREVIEW' ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
+                }`}
+              >
+                Preview
+              </button>
+              <div className="w-px bg-zinc-700" />
+              <button
+                onClick={() => setDiagramMode('RAW')}
+                className={`px-3 py-1.5 text-[11px] font-medium transition ${
+                  diagramMode === 'RAW' ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
+                }`}
+              >
+                Raw
+              </button>
+            </div>
+          )}
+
+          {rightTab === 'ACTIVITY' && renderMermaid(diagrams?.activity)}
+          {rightTab === 'STATE' && renderMermaid(diagrams?.stateMachine)}
+
           {rightTab === 'AUDIT' && audit && (
-            <>
+            <div className="p-4 space-y-4 bg-zinc-900 min-h-full">
               <div className="bg-red-500/10 border border-red-500/25 rounded-xl p-4">
                 <h3 className="font-semibold text-red-400 flex items-center gap-2 mb-3 text-sm">
                   <AlertTriangle className="w-4 h-4" /> Logic Gaps
@@ -251,17 +329,19 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({ diagrams, audit, sch
                   ))}
                 </ul>
               </div>
-            </>
+            </div>
           )}
 
           {rightTab === 'SCHEMA' && schema && (
-            <div className="bg-black/50 border border-zinc-800 rounded-xl p-4">
-              <h3 className="font-semibold text-blue-400 flex items-center gap-2 mb-3 text-sm">
-                <FileJson className="w-4 h-4" /> Database Entities
-              </h3>
-              <pre className="text-xs text-green-400 overflow-x-auto leading-relaxed">
-                {JSON.stringify(schema.tables, null, 2)}
-              </pre>
+            <div className="p-4 bg-zinc-900 min-h-full">
+              <div className="bg-black/50 border border-zinc-800 rounded-xl p-4">
+                <h3 className="font-semibold text-blue-400 flex items-center gap-2 mb-3 text-sm">
+                  <FileJson className="w-4 h-4" /> SQL Schema
+                </h3>
+                <pre className="text-xs text-green-400 overflow-x-auto leading-relaxed">
+                  {schema.sql || JSON.stringify(schema, null, 2)}
+                </pre>
+              </div>
             </div>
           )}
         </div>

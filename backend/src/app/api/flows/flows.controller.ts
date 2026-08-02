@@ -96,7 +96,7 @@ export const completeFlow = async (req: Request, res: Response, next: NextFuncti
       console.warn(FLOWS_MESSAGES.ERROR.INVALID_JSON_AUDIT);
     }
 
-    let result = { diagrams: { activity: '', stateMachine: '' }, schema: { tables: [] } };
+    let result = { diagrams: { activity: '', stateMachine: '' }, schema: { sql: '' } };
     try {
       const parsed = JSON.parse(cleanedDiagramOutput);
       // Safely normalize — LLM sometimes returns objects or null instead of strings
@@ -106,7 +106,7 @@ export const completeFlow = async (req: Request, res: Response, next: NextFuncti
           stateMachine: typeof parsed?.diagrams?.stateMachine === 'string' ? parsed.diagrams.stateMachine : '',
         },
         schema: {
-          tables: Array.isArray(parsed?.schema?.tables) ? parsed.schema.tables : [],
+          sql: typeof parsed?.schema?.sql === 'string' ? parsed.schema.sql : '',
         },
       };
     } catch (error) {

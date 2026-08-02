@@ -22,7 +22,7 @@ export const sessionsValidators = {
         edgeCases: Joi.array().optional(),
       }).optional(),
       schema: Joi.object({
-        tables: Joi.array().optional(),
+        sql: Joi.string().allow('', null).optional(),
       }).optional(),
     }),
     'body'

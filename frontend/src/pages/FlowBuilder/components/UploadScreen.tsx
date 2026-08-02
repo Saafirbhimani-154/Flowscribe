@@ -28,6 +28,8 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   // Stable object URLs — recreated when files array changes, cleaned up on unmount
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  // State for image preview modal
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
     const urls = files.map(f => URL.createObjectURL(f));
@@ -111,7 +113,8 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
                 <img
                   src={previewUrls[idx] ?? ''}
                   alt={`Preview ${idx + 1}`}
-                  className="object-cover w-full h-full opacity-90"
+                  className="object-cover w-full h-full opacity-90 cursor-pointer"
+                  onClick={() => setSelectedImage(previewUrls[idx])}
                 />
                 {/* Remove button */}
                 <button
@@ -189,14 +192,39 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
 
       <button
         onClick={onAnalyze}
-        disabled={(files.length === 0 && context.trim() === '') || loading}
-        className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold py-4 rounded-xl flex items-center justify-center transition"
+        disabled={loading || (files.length === 0 && context.trim() === '')}
+        className={`w-full font-bold py-4 rounded-xl flex items-center justify-center transition ${
+          loading || (files.length === 0 && context.trim() === '')
+            ? 'bg-blue-600/50 text-white/50 cursor-not-allowed'
+            : 'bg-blue-600 hover:bg-blue-700 text-white'
+        }`}
       >
         {loading ? <Loader2 className="animate-spin mr-2" /> : <Code className="mr-2" />}
         Analyze Diagrams
       </button>
 
       {error && <div className="text-red-500 bg-red-500/10 p-4 rounded-lg">{error}</div>}
+
+      {/* Image Preview Modal */}
+      {selectedImage && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm"
+          onClick={() => setSelectedImage(null)}
+        >
+          <button 
+            className="absolute top-6 right-6 text-white/70 hover:text-white bg-black/50 hover:bg-black/80 rounded-full p-2 transition"
+            onClick={() => setSelectedImage(null)}
+          >
+            <X className="w-6 h-6" />
+          </button>
+          <img 
+            src={selectedImage} 
+            alt="Full Preview" 
+            className="max-w-full max-h-full object-contain rounded-md"
+            onClick={(e) => e.stopPropagation()} 
+          />
+        </div>
+      )}
     </div>
   );
 };
