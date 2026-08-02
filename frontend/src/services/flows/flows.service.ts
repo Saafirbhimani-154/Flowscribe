@@ -1,4 +1,4 @@
-import type { SessionData, Diagrams, AuditData, SchemaData } from '../../types/flows.types';
+import type { SessionData } from '../../types/flows.types';
 import type { UploadedFile, FlowAnalyzeResponse, FlowCompleteResponse } from './flows.types';
 
 const API_URL = import.meta.env.VITE_API_URL || '';

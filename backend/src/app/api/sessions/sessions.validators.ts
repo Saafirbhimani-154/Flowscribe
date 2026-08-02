@@ -14,16 +14,16 @@ export const sessionsValidators = {
   saveResult: validateSchema(
     Joi.object({
       diagrams: Joi.object({
-        activity: Joi.string().required(),
-        stateMachine: Joi.string().required(),
-      }).required(),
+        activity: Joi.string().allow('', null).optional(),
+        stateMachine: Joi.string().allow('', null).optional(),
+      }).optional(),
       audit: Joi.object({
-        gaps: Joi.array().required(),
-        edgeCases: Joi.array().required(),
-      }).required(),
+        gaps: Joi.array().optional(),
+        edgeCases: Joi.array().optional(),
+      }).optional(),
       schema: Joi.object({
-        tables: Joi.array().required(),
-      }).required(),
+        tables: Joi.array().optional(),
+      }).optional(),
     }),
     'body'
   ),

@@ -69,7 +69,7 @@ uploadRoutes.post('/', upload.array('images', 5), (req: Request, res: Response) 
  * Serve a stored image by filename (for previews)
  */
 uploadRoutes.get('/:filename', (req: Request, res: Response) => {
-  const filePath = path.join(UPLOAD_DIR, req.params.filename);
+  const filePath = path.join(UPLOAD_DIR, req.params.filename as string);
   if (!fs.existsSync(filePath)) {
     res.status(404).json({ success: false, message: 'File not found.' });
     return;

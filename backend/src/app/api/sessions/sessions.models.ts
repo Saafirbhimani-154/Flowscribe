@@ -34,14 +34,16 @@ export const SessionsModel = {
   },
 
   create: async (userId: string, data: CreateSessionRequest) => {
+    const sessionData: any = {
+      userId,
+      title: data.title || SESSIONS_CONSTANTS.DEFAULT_TITLE,
+    };
+    if (data.contextMessage) {
+      sessionData.messages = { create: { role: 'USER', content: data.contextMessage, type: 'UPLOAD' } };
+    }
+
     return prisma.flowSession.create({
-      data: {
-        userId,
-        title: data.title || SESSIONS_CONSTANTS.DEFAULT_TITLE,
-        messages: data.contextMessage
-          ? { create: { role: 'USER', content: data.contextMessage, type: 'UPLOAD' } }
-          : undefined,
-      },
+      data: sessionData,
     });
   },
 

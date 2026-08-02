@@ -1,29 +1,68 @@
-import React from 'react';
-import { Upload, Code, Loader2, BrainCircuit, FileJson, Layers } from 'lucide-react';
+import React, { useRef, useEffect, useState } from 'react';
+import { Upload, Code, Loader2, BrainCircuit, FileJson, Layers, X, AlertCircle } from 'lucide-react';
 import { MarkdownEditor } from '../../../components/MarkdownEditor';
 
 interface UploadScreenProps {
   files: File[];
   context: string;
-  onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  droppedCount: number;
+  onAddFiles: (files: File[]) => void;
+  onRemoveFile: (idx: number) => void;
   onContextChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onAnalyze: () => void;
   loading: boolean;
   error: string | null;
 }
 
-export const UploadScreen: React.FC<UploadScreenProps> = ({ files, context, onFileChange, onContextChange, onAnalyze, loading, error }) => {
+export const UploadScreen: React.FC<UploadScreenProps> = ({
+  files,
+  context,
+  droppedCount,
+  onAddFiles,
+  onRemoveFile,
+  onContextChange,
+  onAnalyze,
+  loading,
+  error,
+}) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  // Stable object URLs — recreated when files array changes, cleaned up on unmount
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+
+  useEffect(() => {
+    const urls = files.map(f => URL.createObjectURL(f));
+    setPreviewUrls(urls);
+    return () => urls.forEach(u => URL.revokeObjectURL(u));
+  }, [files]);
+
   const wordCount = context.trim() === '' ? 0 : context.trim().split(/\s+/).filter(Boolean).length;
   const isNearLimit = wordCount >= 700;
 
   const handleContextLimit = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newContext = e.target.value;
     const newWordCount = newContext.trim() === '' ? 0 : newContext.trim().split(/\s+/).filter(Boolean).length;
-    // Allow if they are deleting or if under limit
     if (newWordCount <= 750 || newContext.length < context.length) {
       onContextChange(e);
     }
   };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      onAddFiles(Array.from(e.target.files));
+      // Reset input so same file can be re-selected if removed
+      e.target.value = '';
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const dropped = Array.from(e.dataTransfer.files).filter(f =>
+      ['image/jpeg', 'image/png', 'image/webp'].includes(f.type)
+    );
+    if (dropped.length > 0) onAddFiles(dropped);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => e.preventDefault();
 
   if (loading) {
     return (
@@ -53,42 +92,86 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({ files, context, onFi
       </div>
     );
   }
+
   return (
     <div className="max-w-2xl mx-auto text-center space-y-8 mt-20">
       <h1 className="text-4xl font-bold">Upload Process Flow</h1>
       <p className="text-zinc-400">Upload up to 5 photos of your handwritten flow diagrams.</p>
-      
-      <div className="border-2 border-dashed border-zinc-700 rounded-xl p-8 bg-zinc-900/50 hover:bg-zinc-800/50 transition relative overflow-hidden">
-        <input 
-          type="file" 
-          multiple 
-          accept="image/jpeg, image/png, image/webp" 
-          onChange={onFileChange}
-          className="absolute inset-0 opacity-0 cursor-pointer z-10" 
-        />
-        
+
+      {/* Drop zone */}
+      <div
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        className="border-2 border-dashed border-zinc-700 rounded-xl p-8 bg-zinc-900/50 hover:bg-zinc-800/50 transition"
+      >
         {files.length > 0 ? (
           <div className="grid grid-cols-3 gap-4">
-            {files.map((file, idx) => (
-              <div key={idx} className="relative aspect-video rounded-lg overflow-hidden border border-zinc-700 bg-black">
-                <img src={URL.createObjectURL(file)} alt="Preview" className="object-cover w-full h-full opacity-80" />
+            {files.map((_, idx) => (
+              <div key={idx} className="relative aspect-video rounded-lg overflow-hidden border border-zinc-700 bg-black group">
+                <img
+                  src={previewUrls[idx] ?? ''}
+                  alt={`Preview ${idx + 1}`}
+                  className="object-cover w-full h-full opacity-90"
+                />
+                {/* Remove button */}
+                <button
+                  onClick={() => onRemoveFile(idx)}
+                  className="absolute top-1.5 right-1.5 w-6 h-6 bg-black/70 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition z-10"
+                  title="Remove image"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
               </div>
             ))}
+            {/* Add-more tile */}
             {files.length < 5 && (
-              <div className="aspect-video rounded-lg border border-zinc-700 border-dashed flex flex-col items-center justify-center text-zinc-500">
+              <button
+                type="button"
+                onClick={() => inputRef.current?.click()}
+                className="aspect-video rounded-lg border border-zinc-700 border-dashed flex flex-col items-center justify-center text-zinc-500 hover:border-blue-500 hover:text-blue-400 transition"
+              >
                 <Upload className="w-6 h-6 mb-2" />
                 <span className="text-xs">Add more</span>
-              </div>
+              </button>
             )}
           </div>
         ) : (
-          <div className="py-8">
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            className="w-full py-8 flex flex-col items-center justify-center text-center"
+          >
             <Upload className="w-12 h-12 text-blue-500 mx-auto mb-4" />
             <div className="text-zinc-300 font-medium">Drag & drop or click to upload</div>
-          </div>
+            <div className="text-zinc-500 text-sm mt-1">JPEG, PNG, WebP · up to 5 images</div>
+          </button>
         )}
+
+        {/* Hidden file input */}
+        <input
+          ref={inputRef}
+          type="file"
+          multiple
+          accept="image/jpeg,image/png,image/webp"
+          onChange={handleInputChange}
+          className="hidden"
+        />
       </div>
 
+      {/* Dropped-images notice */}
+      {droppedCount > 0 && (
+        <div className="flex items-center gap-2 text-yellow-400 bg-yellow-500/10 border border-yellow-500/20 rounded-lg px-4 py-3 text-sm">
+          <AlertCircle className="w-4 h-4 shrink-0" />
+          {droppedCount} image{droppedCount > 1 ? 's were' : ' was'} dropped — only the first 5 are kept.
+        </div>
+      )}
+
+      {/* Image count badge */}
+      {files.length > 0 && (
+        <p className="text-zinc-500 text-sm -mt-4">{files.length} / 5 image{files.length !== 1 ? 's' : ''} selected</p>
+      )}
+
+      {/* Context editor */}
       <div className="text-left relative">
         <div className="flex justify-between items-end mb-2">
           <label className="block text-sm font-medium text-zinc-400">Additional Context (Optional)</label>
@@ -103,9 +186,9 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({ files, context, onFi
           borderClass={isNearLimit ? 'border-yellow-500/50 focus-within:border-yellow-500' : 'border-zinc-700 focus-within:border-blue-500'}
         />
       </div>
-      
-      <button 
-        onClick={onAnalyze} 
+
+      <button
+        onClick={onAnalyze}
         disabled={(files.length === 0 && context.trim() === '') || loading}
         className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold py-4 rounded-xl flex items-center justify-center transition"
       >

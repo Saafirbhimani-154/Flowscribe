@@ -14,9 +14,11 @@ interface ResultScreenProps {
   schema: SchemaData | null;
   onNewChat?: () => void;
   activeSessionId?: string | null;
+  /** When true the internal sidebar is hidden (parent already renders one) */
+  hideSidebar?: boolean;
 }
 
-export const ResultScreen: React.FC<ResultScreenProps> = ({ diagrams, audit, schema, onNewChat, activeSessionId }) => {
+export const ResultScreen: React.FC<ResultScreenProps> = ({ diagrams, audit, schema, onNewChat, activeSessionId, hideSidebar }) => {
   const mermaidRef = useRef<HTMLPreElement>(null);
   const [chatMessage, setChatMessage] = useState('');
   const [mermaidError, setMermaidError] = useState<string | null>(null);
@@ -35,7 +37,9 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({ diagrams, audit, sch
   useEffect(() => {
     mermaid.initialize({ startOnLoad: false, theme: 'dark', suppressErrorRendering: true });
     setMermaidError(null);
-    if (mermaidRef.current) {
+    // Only run mermaid if the ref exists and the chart has content
+    const currentChart = middleTab === 'ACTIVITY' ? diagrams?.activity : diagrams?.stateMachine;
+    if (mermaidRef.current && currentChart && currentChart.trim().length > 0) {
       mermaidRef.current.removeAttribute('data-processed');
       mermaid.run({ nodes: [mermaidRef.current] }).catch((err: Error) => {
         console.warn('[Mermaid] Syntax error in diagram:', err.message);
@@ -44,77 +48,86 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({ diagrams, audit, sch
     }
   }, [middleTab, diagrams]);
 
-  const renderMermaid = (chart: string) => (
-    <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-950 p-8 overflow-auto">
-      {mermaidError ? (
-        <div className="max-w-xl w-full bg-red-900/20 border border-red-500/30 rounded-xl p-6 text-center">
-          <p className="text-red-400 font-semibold mb-2">⚠️ Diagram syntax error</p>
-          <p className="text-zinc-400 text-sm mb-4">The AI generated an unsupported diagram format. Raw structure:</p>
-          <pre className="text-xs text-zinc-500 text-left bg-black/50 rounded-lg p-4 overflow-x-auto whitespace-pre-wrap">{chart}</pre>
+  const renderMermaid = (chart: string | null | undefined) => {
+    if (!chart || chart.trim().length === 0) {
+      return (
+        <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-950 p-8">
+          <div className="max-w-sm text-center">
+            <p className="text-zinc-500 text-sm">No diagram was generated for this view.</p>
+            <p className="text-zinc-600 text-xs mt-2">The AI may not have produced a valid Mermaid chart. Try re-running the analysis.</p>
+          </div>
         </div>
-      ) : (
-        <pre ref={mermaidRef} className="mermaid">{chart}</pre>
-      )}
-    </div>
-  );
+      );
+    }
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-950 p-8 overflow-auto">
+        {mermaidError ? (
+          <div className="max-w-xl w-full bg-red-900/20 border border-red-500/30 rounded-xl p-6 text-center">
+            <p className="text-red-400 font-semibold mb-2">⚠️ Diagram syntax error</p>
+            <p className="text-zinc-400 text-sm mb-4">The AI generated an unsupported diagram format. Raw structure:</p>
+            <pre className="text-xs text-zinc-500 text-left bg-black/50 rounded-lg p-4 overflow-x-auto whitespace-pre-wrap">{chart}</pre>
+          </div>
+        ) : (
+          <pre ref={mermaidRef} className="mermaid">{chart}</pre>
+        )}
+      </div>
+    );
+  };
 
   return (
-    <div
-      style={{ height: 'calc(100vh - 80px)' }}
-      className="flex bg-zinc-950 -mx-8 -mt-8 text-sm overflow-hidden"
-    >
-      {/* ─── LEFT PANEL: HISTORY ─────────────────────────────── */}
-      <div className="w-60 shrink-0 border-r border-zinc-800 bg-zinc-900 flex flex-col">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800">
-          <span className="font-semibold text-zinc-300 flex items-center gap-2">
-            <History className="w-4 h-4" /> History
-          </span>
-          <button
-            onClick={onNewChat}
-            title="New analysis"
-            className="text-zinc-400 hover:text-blue-400 transition"
-          >
-            <Plus className="w-5 h-5" />
-          </button>
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-2 space-y-1">
-          {/* Active session */}
-          <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 cursor-pointer text-xs leading-snug">
-            <div className="font-semibold mb-0.5">Current Session</div>
-            <div className="text-blue-300/60 truncate">Flow analyzed just now</div>
-          </div>
-          {/* Real sessions from DB */}
-          {sessions.filter(s => s.id !== activeSessionId).map((session) => (
-            <div
-              key={session.id}
-              className="group p-3 rounded-lg text-zinc-500 hover:bg-zinc-800/60 cursor-pointer text-xs leading-snug transition flex items-start justify-between"
+    <div className="flex h-full w-full bg-zinc-950 text-sm overflow-hidden">
+      {/* ─── LEFT PANEL: HISTORY (only when not hidden by parent) ─── */}
+      {!hideSidebar && (
+        <div className="w-60 shrink-0 border-r border-zinc-800 bg-zinc-900 flex flex-col">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800">
+            <span className="font-semibold text-zinc-300 flex items-center gap-2">
+              <History className="w-4 h-4" /> History
+            </span>
+            <button
+              onClick={onNewChat}
+              title="New analysis"
+              className="text-zinc-400 hover:text-blue-400 transition"
             >
-              <div>
-                <div className="font-medium text-zinc-400 truncate max-w-[160px]">{session.title}</div>
-                <div className="text-zinc-600 mt-0.5">
-                  {new Date(session.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
-                  {' · '}{session._count.messages} msg{session._count.messages !== 1 ? 's' : ''}
-                </div>
-              </div>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  sessionsService.deleteSession(session.id).then(() =>
-                    setSessions(prev => prev.filter(s => s.id !== session.id))
-                  );
-                }}
-                className="opacity-0 group-hover:opacity-100 text-zinc-600 hover:text-red-400 transition mt-0.5"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-              </button>
+              <Plus className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-2 space-y-1">
+            <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 cursor-pointer text-xs leading-snug">
+              <div className="font-semibold mb-0.5">Current Session</div>
+              <div className="text-blue-300/60 truncate">Flow analyzed just now</div>
             </div>
-          ))}
-          {sessions.length === 0 && (
-            <div className="text-zinc-600 text-xs p-3 italic">No past sessions yet.</div>
-          )}
+            {sessions.filter(s => s.id !== activeSessionId).map((session) => (
+              <div
+                key={session.id}
+                className="group p-3 rounded-lg text-zinc-500 hover:bg-zinc-800/60 cursor-pointer text-xs leading-snug transition flex items-start justify-between"
+              >
+                <div>
+                  <div className="font-medium text-zinc-400 truncate max-w-[160px]">{session.title}</div>
+                  <div className="text-zinc-600 mt-0.5">
+                    {new Date(session.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
+                    {' · '}{session._count.messages} msg{session._count.messages !== 1 ? 's' : ''}
+                  </div>
+                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    sessionsService.deleteSession(session.id).then(() =>
+                      setSessions(prev => prev.filter(s => s.id !== session.id))
+                    );
+                  }}
+                  className="opacity-0 group-hover:opacity-100 text-zinc-600 hover:text-red-400 transition mt-0.5"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+            {sessions.length === 0 && (
+              <div className="text-zinc-600 text-xs p-3 italic">No past sessions yet.</div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ─── CENTER PANEL: DIAGRAMS + RE-CHAT ────────────────── */}
       <div className="flex-1 flex flex-col min-w-0">
@@ -135,14 +148,10 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({ diagrams, audit, sch
           ))}
         </div>
 
-        {/* Diagram area */}
+        {/* Diagram area — renderMermaid handles null/empty with a placeholder */}
         <div className="flex-1 overflow-auto bg-zinc-950">
-          {middleTab === 'ACTIVITY' && diagrams?.activity
-            ? renderMermaid(diagrams.activity)
-            : null}
-          {middleTab === 'STATE' && diagrams?.stateMachine
-            ? renderMermaid(diagrams.stateMachine)
-            : null}
+          {middleTab === 'ACTIVITY' && renderMermaid(diagrams?.activity)}
+          {middleTab === 'STATE' && renderMermaid(diagrams?.stateMachine)}
         </div>
 
         {/* Re-chat input */}

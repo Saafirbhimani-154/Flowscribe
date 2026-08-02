@@ -98,10 +98,24 @@ export const completeFlow = async (req: Request, res: Response, next: NextFuncti
 
     let result = { diagrams: { activity: '', stateMachine: '' }, schema: { tables: [] } };
     try {
-      result = JSON.parse(cleanedDiagramOutput);
+      const parsed = JSON.parse(cleanedDiagramOutput);
+      // Safely normalize — LLM sometimes returns objects or null instead of strings
+      result = {
+        diagrams: {
+          activity: typeof parsed?.diagrams?.activity === 'string' ? parsed.diagrams.activity : '',
+          stateMachine: typeof parsed?.diagrams?.stateMachine === 'string' ? parsed.diagrams.stateMachine : '',
+        },
+        schema: {
+          tables: Array.isArray(parsed?.schema?.tables) ? parsed.schema.tables : [],
+        },
+      };
     } catch (error) {
       console.warn(FLOWS_MESSAGES.ERROR.INVALID_JSON_DIAGRAMS);
     }
+
+    // Safely normalize audit fields
+    if (!Array.isArray(audit.gaps)) audit.gaps = [];
+    if (!Array.isArray((audit as any).edgeCases)) (audit as any).edgeCases = [];
 
     return res.status(200).json({
       success: true,
