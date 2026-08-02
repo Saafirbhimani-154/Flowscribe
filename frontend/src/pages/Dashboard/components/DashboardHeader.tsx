@@ -1,9 +1,16 @@
 import { motion } from 'framer-motion';
 
 export const DashboardHeader = () => {
-  const userStr = localStorage.getItem('flowscribe_user');
-  const user = userStr ? JSON.parse(userStr) : { profile: { firstName: 'User' } };
-  const firstName = user?.profile?.firstName || 'User';
+  let firstName = 'User';
+  try {
+    const userStr = localStorage.getItem('flowscribe_user');
+    if (userStr) {
+      const user = JSON.parse(userStr);
+      firstName = user?.userProfile?.firstName || user?.profile?.firstName || user?.auth?.email?.split('@')[0] || 'User';
+    }
+  } catch {
+    // Corrupted localStorage — fallback to default
+  }
 
   return (
     <motion.div 

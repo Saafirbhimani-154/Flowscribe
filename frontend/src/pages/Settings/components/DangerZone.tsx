@@ -1,14 +1,31 @@
 import { useState } from 'react';
 import { AlertTriangle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import ConfirmModal from './ConfirmModal';
 
 export default function DangerZone() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
+  const slug = localStorage.getItem('flowscribe_slug');
   
-  const handleDelete = () => {
+  const handleDelete = async () => {
     setIsModalOpen(false);
-    // Real logic to delete goes here
-    console.log("Account deleted!");
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/user-profile/${slug}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      if (res.ok) {
+        localStorage.removeItem('flowscribe_role');
+        localStorage.removeItem('flowscribe_slug');
+        localStorage.removeItem('flowscribe_user');
+        navigate('/login', { replace: true });
+      } else {
+        console.error('Failed to delete account');
+      }
+    } catch (err) {
+      console.error('Delete failed:', err);
+    }
   };
 
   return (

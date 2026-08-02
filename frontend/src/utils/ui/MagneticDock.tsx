@@ -107,7 +107,7 @@ export function MagneticDock({ items }: MagneticDockProps) {
         ) : (
           <DockIcon
             key={idx}
-            icon={item.icon!}
+            icon={item.icon || (() => <></>)}
             mouseX={mouseX}
             title={item.title}
             href={item.href}

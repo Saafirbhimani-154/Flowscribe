@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 
-export default function DashboardPage() {
+export default function SuperAdminDashboard() {
   return (
     <div className="min-h-screen bg-[#F4F1EA] flex items-center justify-center font-sans selection:bg-stone-300">
       <motion.h1 

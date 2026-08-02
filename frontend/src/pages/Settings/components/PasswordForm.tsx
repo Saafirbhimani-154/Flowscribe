@@ -13,14 +13,21 @@ export default function PasswordForm({ slug }: { slug: string }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const validatePassword = (pass: string) => {
-    if (pass.length > 0 && pass.length < 8) return 'Password must be at least 8 characters long';
+    if (!pass || pass.length < 8) return 'Password must be at least 8 characters long';
     return '';
   };
 
   const handleTriggerSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (validatePassword(formData.newPassword)) return;
-    if (formData.newPassword !== formData.confirmNewPassword) return;
+    const passError = validatePassword(formData.newPassword);
+    if (passError) {
+      setErrorMsg(passError);
+      return;
+    }
+    if (formData.newPassword !== formData.confirmNewPassword) {
+      setErrorMsg('Passwords do not match');
+      return;
+    }
     
     setErrorMsg('');
     setIsModalOpen(true);

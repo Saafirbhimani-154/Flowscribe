@@ -20,14 +20,18 @@ export default function ProfileForm({ slug }: { slug: string }) {
         const res = await fetch(`${import.meta.env.VITE_API_URL}/user-profile/${slug}`, { credentials: 'include' });
         if (res.ok) {
           const data = await res.json();
-          setFormData({
-            firstName: data.user.firstName,
-            lastName: data.user.lastName,
-            email: data.user.email,
-          });
+          if (data && data.user) {
+            setFormData({
+              firstName: data.user.firstName,
+              lastName: data.user.lastName,
+              email: data.user.email,
+            });
+          }
+        } else {
+          console.error('Failed to load profile: server returned error');
         }
       } catch (err) {
-        console.error('Failed to load profile');
+        console.error('Failed to load profile:', err);
       }
     };
     if(slug) fetchProfile();

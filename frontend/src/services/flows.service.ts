@@ -1,5 +1,7 @@
 import type { SessionData, Diagrams, AuditData, SchemaData } from '../types/flows.types';
 
+const API_URL = import.meta.env.VITE_API_URL || '';
+
 export const flowsService = {
   analyzeFlow: async (files: File[], context: string = '') => {
     const formData = new FormData();
@@ -8,8 +10,9 @@ export const flowsService = {
       formData.append('context', context);
     }
 
-    const res = await fetch('/api/v1/flows/analyze', {
+    const res = await fetch(`${API_URL}/flows/analyze`, {
       method: 'POST',
+      credentials: 'include',
       body: formData,
     });
     
@@ -20,9 +23,10 @@ export const flowsService = {
   },
 
   completeFlow: async (sessionData: SessionData, answers: Record<string, string>) => {
-    const res = await fetch('/api/v1/flows/complete', {
+    const res = await fetch(`${API_URL}/flows/complete`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ sessionData, answers })
     });
     

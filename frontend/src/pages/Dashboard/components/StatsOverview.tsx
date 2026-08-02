@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion';
-import { Activity, FileText, Users, Clock } from 'lucide-react';
+import { Activity, FileText, Users, Clock, FolderOpen } from 'lucide-react';
 
 export const StatsOverview = () => {
   const stats = [
-    { label: 'Active Projects', value: '12', icon: Folder, trend: '+2 this week' },
+    { label: 'Active Projects', value: '12', icon: FolderOpen, trend: '+2 this week' },
     { label: 'Flows Generated', value: '48', icon: FileText, trend: '+15 this week' },
     { label: 'Team Members', value: '3', icon: Users, trend: 'Stable' },
     { label: 'Hours Saved', value: '124h', icon: Clock, trend: '+12h this week' },
@@ -37,6 +37,3 @@ export const StatsOverview = () => {
     </div>
   );
 };
-
-// Hack for missing lucide icon
-const Folder = Activity;
