@@ -15,7 +15,7 @@ export const rateLimitMiddleware = async (req: Request, res: Response, next: Nex
     const today = new Date();
     today.setUTCHours(0, 0, 0, 0);
 
-    const MAX_PROMPTS_PER_DAY = 5;
+    const MAX_PROMPTS_PER_DAY = parseInt(process.env.MAX_PROMPTS_PER_DAY || '5', 10);
 
     // Atomic increment
     const usage = await prisma.promptUsage.upsert({
