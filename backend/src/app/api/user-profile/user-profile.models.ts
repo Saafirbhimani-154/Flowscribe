@@ -102,4 +102,12 @@ export const UserProfileModel = {
       where: { userId },
     });
   },
+
+  // ─── Account: Soft delete ──────────────────────────────────────────────────
+  deleteUser: async (id: string) => {
+    return prisma.user.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
+  },
 };

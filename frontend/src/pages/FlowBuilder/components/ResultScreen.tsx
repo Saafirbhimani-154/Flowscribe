@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { LayoutDashboard, AlertTriangle, FileJson } from 'lucide-react';
 import mermaid from 'mermaid';
 import type { Diagrams, AuditData, SchemaData } from '../../../types/flows.types';
@@ -12,15 +12,21 @@ interface ResultScreenProps {
 }
 
 export const ResultScreen: React.FC<ResultScreenProps> = ({ activeTab, setActiveTab, diagrams, audit, schema }) => {
-  useEffect(() => {
-    mermaid.initialize({ startOnLoad: true, theme: 'dark' });
-    mermaid.contentLoaded();
-  }, [activeTab]);
+  const mermaidRef = useRef<HTMLPreElement>(null);
 
-  const renderMermaid = (chart: string, id: string) => {
+  useEffect(() => {
+    mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+    if (mermaidRef.current) {
+      // Reset the processed flag so mermaid re-renders
+      mermaidRef.current.removeAttribute('data-processed');
+      mermaid.run({ nodes: [mermaidRef.current] });
+    }
+  }, [activeTab, diagrams]);
+
+  const renderMermaid = (chart: string) => {
     return (
       <div className="bg-zinc-900 border border-zinc-800 p-8 rounded-xl overflow-auto min-h-[400px]">
-        <pre className="mermaid" id={id}>{chart}</pre>
+        <pre ref={mermaidRef} className="mermaid">{chart}</pre>
       </div>
     );
   };
@@ -42,21 +48,31 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({ activeTab, setActive
       </div>
 
       <div className="mt-6">
-        {activeTab === 'ACTIVITY' && diagrams?.activity && renderMermaid(diagrams.activity, 'mermaid-activity')}
-        {activeTab === 'STATE' && diagrams?.stateMachine && renderMermaid(diagrams.stateMachine, 'mermaid-state')}
+        {activeTab === 'ACTIVITY' && diagrams?.activity && renderMermaid(diagrams.activity)}
+        {activeTab === 'STATE' && diagrams?.stateMachine && renderMermaid(diagrams.stateMachine)}
         
         {activeTab === 'AUDIT' && audit && (
           <div className="space-y-6">
             <div className="bg-red-500/10 border border-red-500/30 p-6 rounded-xl">
               <h3 className="text-xl font-bold text-red-400 flex items-center mb-4"><AlertTriangle className="mr-2" /> Logic Gaps</h3>
               <ul className="list-disc pl-6 space-y-2 text-zinc-300">
-                {audit.gaps.map((gap, i) => <li key={i}>{gap}</li>)}
+                {audit.gaps.map((gap, i) => (
+                  <li key={i}>
+                    <span className="font-medium">{typeof gap === 'string' ? gap : gap.issue}</span>
+                    {typeof gap === 'object' && gap.recommendation && <span className="text-zinc-500"> — {gap.recommendation}</span>}
+                  </li>
+                ))}
               </ul>
             </div>
             <div className="bg-yellow-500/10 border border-yellow-500/30 p-6 rounded-xl">
               <h3 className="text-xl font-bold text-yellow-400 flex items-center mb-4"><AlertTriangle className="mr-2" /> Edge Cases</h3>
               <ul className="list-disc pl-6 space-y-2 text-zinc-300">
-                {audit.edgeCases.map((edge, i) => <li key={i}>{edge}</li>)}
+                {audit.edgeCases.map((edge, i) => (
+                  <li key={i}>
+                    <span className="font-medium">{typeof edge === 'string' ? edge : edge.scenario}</span>
+                    {typeof edge === 'object' && edge.resolution && <span className="text-zinc-500"> — {edge.resolution}</span>}
+                  </li>
+                ))}
               </ul>
             </div>
           </div>

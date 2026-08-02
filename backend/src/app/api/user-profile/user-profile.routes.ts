@@ -6,6 +6,7 @@ import {
   confirmSlug,
   getSettings,
   updateSettings,
+  deleteAccount,
 } from './user-profile.controller';
 import { userProfileValidators } from './user-profile.validators';
 
@@ -27,5 +28,8 @@ router.patch('/:slugId/slug', userProfileValidators.confirmSlug, confirmSlug);
 // ─── Settings ─────────────────────────────────────────────────────────────────
 router.get('/:slugId/settings', getSettings);
 router.patch('/:slugId/settings', userProfileValidators.updateSettings, updateSettings);
+
+// ─── Account ──────────────────────────────────────────────────────────────────
+router.delete('/:slugId', deleteAccount);
 
 export default router;

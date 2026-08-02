@@ -1,6 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 
-// m-8: Singleton PrismaClient — prevents connection pool exhaustion on hot reload / in tests
-const prisma = new PrismaClient();
+const globalForPrisma = global as unknown as { prisma: PrismaClient };
+
+const prisma = globalForPrisma.prisma || new PrismaClient();
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
 export default prisma;

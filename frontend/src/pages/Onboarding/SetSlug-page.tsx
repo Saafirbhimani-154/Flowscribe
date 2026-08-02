@@ -30,7 +30,9 @@ export default function SetSlugPage() {
       setStatus('checking');
       try {
         const API_URL = import.meta.env.VITE_API_URL;
-        const res = await fetch(`${API_URL}/auth/check-slug/${slug}`);
+        const res = await fetch(`${API_URL}/auth/check-slug/${slug}`, {
+          credentials: 'include',
+        });
         const data = await res.json();
         
         if (res.ok && data.available) {
@@ -49,7 +51,7 @@ export default function SetSlugPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (status === 'taken' || status === 'checking') return;
+    if (status === 'taken' || status === 'checking' || status === 'error' || !slug.trim()) return;
     
     setIsSubmitting(true);
     try {
@@ -116,9 +118,9 @@ export default function SetSlugPage() {
           <motion.button 
             whileHover={{ scale: (status === 'taken' || status === 'checking') ? 1 : 1.02 }}
             whileTap={{ scale: (status === 'taken' || status === 'checking') ? 1 : 0.98 }}
-            disabled={status === 'taken' || status === 'checking' || isSubmitting}
+            disabled={status === 'taken' || status === 'checking' || status === 'error' || isSubmitting || !slug.trim()}
             className={`w-full py-3 font-medium rounded-xl flex items-center justify-center gap-2 transition-all mt-4
-              ${(status === 'taken' || status === 'checking' || isSubmitting)
+              ${(status === 'taken' || status === 'checking' || status === 'error' || isSubmitting || !slug.trim())
                 ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed opacity-50'
                 : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-[0_0_20px_rgba(37,99,235,0.2)]' 
               }`}

@@ -17,9 +17,9 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
     // Set user on request
     req.user = { id: decoded.userId, ...(decoded.roleId ? { roleId: decoded.roleId } : {}) };
 
-    // Sliding Session: Generate a fresh token with 30m expiry
+    // Sliding Session: Generate a fresh token with 30m expiry — preserve roleId
     const refreshedToken = jwt.sign(
-      { userId: decoded.userId },
+      { userId: decoded.userId, roleId: decoded.roleId },
       AUTH_CONSTANTS.JWT_SECRET as string,
       { expiresIn: AUTH_CONSTANTS.JWT_EXPIRES_IN as any }
     );

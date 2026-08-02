@@ -1,12 +1,23 @@
 export interface SessionData {
+  title?: string;
   nodes: any[];
   edges: any[];
-  actors: any[];
+  actors?: any[];
+}
+
+export interface GapItem {
+  issue: string;
+  recommendation?: string;
+}
+
+export interface EdgeCaseItem {
+  scenario: string;
+  resolution?: string;
 }
 
 export interface AuditData {
-  gaps: string[];
-  edgeCases: string[];
+  gaps: (string | GapItem)[];
+  edgeCases: (string | EdgeCaseItem)[];
 }
 
 export interface SchemaData {

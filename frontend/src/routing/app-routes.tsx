@@ -21,17 +21,15 @@ import SettingsPassword from '../pages/Settings/tabs/SettingsPassword';
 import SettingsLanguage from '../pages/Settings/tabs/SettingsLanguage';
 
 import { MagneticDock } from '../utils/ui/MagneticDock';
-import { Home, Mail, LogIn, LogOut, FileText, Shield, Zap, HelpCircle, Settings, Layout } from 'lucide-react';
+import { Home, Mail, LogIn, LogOut, FileText, Shield, Zap, HelpCircle, Settings } from 'lucide-react';
+import PrivateRoute from './private-routes';
 
 function MainLayout() {
   const location = useLocation();
-  const isUserArea = location.pathname.endsWith('/dashboard') || 
-                    location.pathname.includes('/settings') || 
-                    location.pathname.endsWith('/main') || 
-                    location.pathname === '/setup-workspace' ||
-                    location.pathname.endsWith('/flow-builder');
-  const userSlug = localStorage.getItem('flowscribe_slug') || 'dashboard';
   const role = localStorage.getItem('flowscribe_role');
+  const slug = localStorage.getItem('flowscribe_slug');
+  const userSlug = slug || 'dashboard';
+  const isUserArea = !!role && !!slug && location.pathname !== '/' && location.pathname !== '/login' && location.pathname !== '/signup';
 
   const publicDock = [
     { title: 'Home', icon: Home, href: '/' },
@@ -67,12 +65,12 @@ function MainLayout() {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/setup-workspace" element={<SetSlugPage />} />
         <Route path="/logout" element={<LogoutPage />} />
-        <Route path="/:slug/dashboard" element={<DashboardRouter />} />
-        <Route path="/:slug/main" element={<OwnerMainPage />} />
-        <Route path="/:slug/flow-builder" element={<FlowBuilderPage />} />
+        <Route path="/:slug/dashboard" element={<PrivateRoute><DashboardRouter /></PrivateRoute>} />
+        <Route path="/:slug/main" element={<PrivateRoute><OwnerMainPage /></PrivateRoute>} />
+        <Route path="/:slug/flow-builder" element={<PrivateRoute><FlowBuilderPage /></PrivateRoute>} />
         
         {/* Nested Settings Routes */}
-        <Route path="/:slug/settings" element={<SettingsLayout />}>
+        <Route path="/:slug/settings" element={<PrivateRoute><SettingsLayout /></PrivateRoute>}>
           <Route index element={<Navigate to="profile" replace />} />
           <Route path="profile" element={<SettingsProfile />} />
           <Route path="password" element={<SettingsPassword />} />

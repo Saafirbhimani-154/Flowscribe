@@ -88,6 +88,9 @@ export class FlowsService {
           }
         });
       }
+
+      // Fallback — should not reach here
+      return JSON.stringify({ message: 'demo ok' });
     }
 
     if (this.apiKeys.length === 0) {
