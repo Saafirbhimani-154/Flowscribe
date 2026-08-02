@@ -13,6 +13,8 @@ export default function LogoutPage() {
         console.error('Logout failed:', err);
       } finally {
         localStorage.removeItem('flowscribe_role');
+        localStorage.removeItem('flowscribe_slug');
+        localStorage.removeItem('flowscribe_user');
         navigate('/login', { replace: true });
       }
     };

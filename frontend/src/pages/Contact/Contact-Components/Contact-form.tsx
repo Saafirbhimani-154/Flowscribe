@@ -9,10 +9,7 @@ import { nameValidationRules } from '../../../utils/validation/nameValidation';
 import { messageValidationRules } from '../../../utils/validation/messageValidation';
 import { CONTACT_ANIMATION_VARIANTS, CONTACT_LIMITS } from './Contact-constants';
 
-interface ContactFormProps {
-  onSubmit: (e: React.FormEvent<HTMLFormElement>, data: { name: string; email: string; message: string }) => void;
-  isLoading?: boolean;
-}
+import type { ContactFormProps } from './Contact-interface';
 
 export default function ContactForm({ onSubmit, isLoading }: ContactFormProps) {
   const schema: ValidationSchema<{ name: string; email: string; message: string }> = useMemo(() => ({

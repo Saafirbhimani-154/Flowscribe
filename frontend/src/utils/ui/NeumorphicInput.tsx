@@ -1,12 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-interface NeumorphicInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  icon: LucideIcon;
-  error?: string;
-}
+import type { NeumorphicInputProps } from './ui-interfaces';
 
 export default function NeumorphicInput({ icon: Icon, error, type, ...props }: NeumorphicInputProps) {
   const [showPassword, setShowPassword] = useState(false);

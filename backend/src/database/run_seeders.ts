@@ -35,6 +35,7 @@ async function runSeeders() {
           }
         } catch (error) {
           console.error(`❌ Failed to execute seeder ${file}:`, error);
+          await prisma.$disconnect();
           process.exit(1);
         }
       }
@@ -45,7 +46,8 @@ async function runSeeders() {
   await prisma.$disconnect();
 }
 
-runSeeders().catch(e => {
+runSeeders().catch(async (e) => {
   console.error(e);
+  await prisma.$disconnect();
   process.exit(1);
 });

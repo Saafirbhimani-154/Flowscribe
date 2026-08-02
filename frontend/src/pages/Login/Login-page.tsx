@@ -17,6 +17,7 @@ export default function LoginPage() {
       const data = await loginService(values);
       localStorage.setItem('flowscribe_role', data.role.name);
       localStorage.setItem('flowscribe_slug', data.slug.name);
+      localStorage.setItem('flowscribe_user', JSON.stringify(data));
       
       if (!data.slug.isSet) {
         navigate('/setup-workspace');

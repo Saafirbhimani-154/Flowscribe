@@ -17,19 +17,21 @@ model Role {
 }
 
 model User {
-  id          String       @id @default(uuid())
-  firstName   String
-  lastName    String
-  email       String       @unique
-  password    String
-  slugId      String       @unique
-  isSlugSet   Boolean      @default(false)
-  roleId      String
-  role        Role         @relation(fields: [roleId], references: [id])
-  profile     UserProfile?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  deletedAt   DateTime?
+  id           String        @id @default(uuid())
+  firstName    String
+  lastName     String
+  email        String        @unique
+  password     String
+  slugId       String        @unique
+  isSlugSet    Boolean       @default(false)
+  roleId       String
+  role         Role          @relation(fields: [roleId], references: [id])
+  profile      UserProfile?
+  promptUsages PromptUsage[]
+  flowSessions FlowSession[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  deletedAt    DateTime?
 
   @@index([email])
   @@index([slugId])
@@ -53,4 +55,52 @@ model ContactMessage {
   message   String   @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model PromptUsage {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  date      DateTime @db.Date
+  count     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, date])
+}
+
+model FlowSession {
+  id        String        @id @default(uuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String        @default("Untitled Flow")
+  result    FlowResult?
+  messages  FlowMessage[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([userId])
+}
+
+model FlowResult {
+  id        String      @id @default(uuid())
+  sessionId String      @unique
+  session   FlowSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  diagrams  Json        @default("{}")
+  audit     Json        @default("{}")
+  schema    Json        @default("{}")
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model FlowMessage {
+  id        String      @id @default(uuid())
+  sessionId String
+  session   FlowSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  role      String      @default("USER")   // USER | ASSISTANT
+  content   String      @db.Text
+  type      String      @default("TEXT")   // TEXT | UPLOAD | RESULT
+  createdAt DateTime    @default(now())
+
+  @@index([sessionId])
 }

@@ -38,3 +38,8 @@ export interface UserProfileResponse {
   } | null;
   createdAt: Date;
 }
+
+export interface UsageResponse {
+  count: number;
+  limit: number;
+}

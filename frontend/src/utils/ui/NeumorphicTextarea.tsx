@@ -1,11 +1,7 @@
-import React from 'react';
-import type { LucideIcon } from 'lucide-react';
+
 import { motion, AnimatePresence } from 'framer-motion';
 
-interface NeumorphicTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
-  icon: LucideIcon;
-  error?: string;
-}
+import type { NeumorphicTextareaProps } from './ui-interfaces';
 
 export default function NeumorphicTextarea({ icon: Icon, error, ...props }: NeumorphicTextareaProps) {
   return (

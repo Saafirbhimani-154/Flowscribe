@@ -14,6 +14,6 @@ export const AUTH_MESSAGES = {
   VALIDATION: {
     REQUIRED_FIELDS: 'First name, last name, email, and password are required.',
     INVALID_EMAIL: 'Please provide a valid email address.',
-    PASSWORD_LENGTH: 'Password must be at least 6 characters long.',
+    PASSWORD_LENGTH: 'Password must be at least 8 characters long.',
   }
 };

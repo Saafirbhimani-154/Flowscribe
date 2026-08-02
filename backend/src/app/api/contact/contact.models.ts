@@ -1,10 +1,6 @@
 import prisma from '../../../database/prisma';
+import type { ContactMessageDTO } from './contact.interface';
 
-export interface ContactMessageDTO {
-  name: string;
-  email: string;
-  message: string;
-}
 
 export const insertContactMessage = async (data: ContactMessageDTO) => {
   return prisma.contactMessage.create({

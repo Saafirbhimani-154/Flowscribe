@@ -17,7 +17,7 @@ export default function SignupPage() {
       // M-10: Robust name parsing — handle single-word names gracefully
       const nameParts = (values.name as string).trim().split(/\s+/);
       const firstName = nameParts[0] ?? '';
-      const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : firstName; // Use firstName if no lastName given
+      const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
 
       const payload = {
         firstName,
@@ -29,6 +29,7 @@ export default function SignupPage() {
       const data = await registerService(payload);
       localStorage.setItem('flowscribe_role', data.role.name);
       localStorage.setItem('flowscribe_slug', data.slug.name);
+      localStorage.setItem('flowscribe_user', JSON.stringify(data));
       
       if (!data.slug.isSet) {
         navigate('/setup-workspace');

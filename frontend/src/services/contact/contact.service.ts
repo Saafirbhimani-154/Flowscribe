@@ -7,6 +7,7 @@ export const ContactService = {
     const res = await fetch(`${API_URL}/contact/send`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify(data)
     });
 

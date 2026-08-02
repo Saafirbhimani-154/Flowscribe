@@ -13,9 +13,15 @@ export default function PreferencesForm({ slug }: { slug: string }) {
         const res = await fetch(`${import.meta.env.VITE_API_URL}/user-profile/${slug}/settings`, { credentials: 'include' });
         if (res.ok) {
           const data = await res.json();
-          setFormData({ language: data.settings.language, theme: data.settings.theme });
+          if (data && data.settings) {
+            setFormData({ language: data.settings.language, theme: data.settings.theme });
+          }
+        } else {
+          console.error('Failed to load preferences: server returned error');
         }
-      } catch (err) {}
+      } catch (err) {
+        console.error('Failed to load preferences:', err);
+      }
     };
     if (slug) fetchSettings();
   }, [slug]);

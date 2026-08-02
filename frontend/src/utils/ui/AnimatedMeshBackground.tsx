@@ -1,14 +1,11 @@
 import { motion } from 'framer-motion';
 
-interface Props {
-  colors?: [string, string];
-  reverse?: boolean;
-}
+import type { AnimatedMeshBackgroundProps } from './ui-interfaces';
 
 export default function AnimatedMeshBackground({ 
   colors = ['from-blue-600/20', 'to-violet-600/20'],
   reverse = false
-}: Props) {
+}: AnimatedMeshBackgroundProps) {
   return (
     <motion.div 
       animate={{ rotate: reverse ? -360 : 360 }}

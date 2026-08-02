@@ -5,8 +5,10 @@ import helmet from 'helmet';
 import dotenv from 'dotenv';
 import appRoutes from '../app/app.routes';
 
+import path from 'path';
 // B-2: Load environment variables FIRST — before any module reads process.env
-dotenv.config({ path: '.env.local' });
+// We now read from the single root .env file
+dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 
 // M-6: Guard against missing FRONTEND_URL in production
 if (process.env.NODE_ENV === 'production' && !process.env.FRONTEND_URL) {
@@ -23,7 +25,7 @@ app.use(helmet());
 app.use(express.json({ limit: '10kb' }));
 app.use(cookieParser());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:7000',
+  origin: [process.env.FRONTEND_URL || 'http://localhost:7000', 'http://127.0.0.1:7000'],
   credentials: true
 }));
 

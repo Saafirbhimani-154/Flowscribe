@@ -9,6 +9,7 @@ export default function ContactPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [formKey, setFormKey] = useState(0);
 
   const handleContactSubmit = async (data: { name: string; email: string; message: string }) => {
     setIsLoading(true);
@@ -16,6 +17,7 @@ export default function ContactPage() {
     try {
       await ContactService.sendMessage(data);
       setIsSuccess(true);
+      setFormKey(prev => prev + 1);
     } catch (error: any) {
       const msg = error.errors ? error.errors.join(', ') : (error.message || 'Failed to send message.');
       setErrorMsg(msg);
@@ -39,7 +41,7 @@ export default function ContactPage() {
               {errorMsg}
             </div>
           )}
-          <ContactForm onSubmit={(e, data) => { e.preventDefault(); handleContactSubmit(data as any); }} isLoading={isLoading} />
+          <ContactForm key={formKey} onSubmit={(e, data) => { e.preventDefault(); handleContactSubmit(data as any); }} isLoading={isLoading} />
         </div>
 
       </div>
