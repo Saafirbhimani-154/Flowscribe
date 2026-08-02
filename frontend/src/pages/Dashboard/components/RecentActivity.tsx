@@ -1,13 +1,19 @@
 import { motion } from 'framer-motion';
-import { PenTool, MessageSquare, Plus, ArrowRight } from 'lucide-react';
+import { PenTool, Plus, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-export const RecentActivity = () => {
+import type { SessionSummary } from '../../../services/sessions/sessions.types';
+
+interface RecentActivityProps {
+  sessions?: SessionSummary[];
+  loading?: boolean;
+}
+
+export const RecentActivity = ({ sessions = [], loading = false }: RecentActivityProps) => {
   const navigate = useNavigate();
   const slug = localStorage.getItem('flowscribe_slug') || 'dashboard';
 
-  // Currently no backend data. Using an empty state to demonstrate premium design.
-  const activities: any[] = []; 
+  const recentSessions = [...sessions].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 5);
 
   return (
     <div className="bg-zinc-900/60 backdrop-blur-xl border border-zinc-800 rounded-3xl p-8 relative z-10 shadow-lg shadow-black/20">
@@ -24,27 +30,32 @@ export const RecentActivity = () => {
         </button>
       </div>
 
-      {activities.length > 0 ? (
+      {loading ? (
+        <div className="flex justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        </div>
+      ) : recentSessions.length > 0 ? (
         <div className="space-y-3">
-          {activities.map((activity, i) => (
+          {recentSessions.map((session, i) => (
             <motion.div
-              key={activity.id}
+              key={session.id}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.1 }}
+              onClick={() => navigate(`/${slug}/flow-builder?session=${session.id}`)}
               className="flex items-center justify-between p-4 bg-zinc-900 border border-zinc-800 rounded-2xl hover:bg-zinc-800 transition-colors cursor-pointer group"
             >
               <div className="flex items-center gap-4">
-                <div className={`p-3 rounded-xl ${activity.type === 'flow' ? 'bg-blue-500/10 text-blue-500' : 'bg-purple-500/10 text-purple-500'} group-hover:scale-110 transition-transform`}>
-                  {activity.type === 'flow' ? <PenTool className="w-5 h-5" /> : <MessageSquare className="w-5 h-5" />}
+                <div className={`p-3 rounded-xl bg-blue-500/10 text-blue-500 group-hover:scale-110 transition-transform`}>
+                  <PenTool className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="text-zinc-200 font-medium">{activity.title}</h4>
-                  <p className="text-sm text-zinc-500">{activity.time}</p>
+                  <h4 className="text-zinc-200 font-medium">{session.title || 'Untitled Flow'}</h4>
+                  <p className="text-sm text-zinc-500">{new Date(session.createdAt).toLocaleDateString()}</p>
                 </div>
               </div>
-              <span className={`text-xs font-medium px-3 py-1 rounded-full border ${activity.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-blue-500/10 text-blue-400 border-blue-500/20'}`}>
-                {activity.status}
+              <span className={`text-xs font-medium px-3 py-1 rounded-full border bg-emerald-500/10 text-emerald-400 border-emerald-500/20`}>
+                Generated
               </span>
             </motion.div>
           ))}

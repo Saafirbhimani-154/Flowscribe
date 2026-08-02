@@ -6,6 +6,7 @@ export const USER_PROFILE_MESSAGES = {
     SLUG_CONFIRMED: 'Slug confirmed successfully.',
     SETTINGS_FETCHED: 'Settings fetched successfully.',
     SETTINGS_UPDATED: 'Settings updated successfully.',
+    USAGE_FETCHED: 'Usage fetched successfully.',
   },
   ERROR: {
     USER_NOT_FOUND: 'User not found.',

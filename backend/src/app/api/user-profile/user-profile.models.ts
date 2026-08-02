@@ -110,4 +110,13 @@ export const UserProfileModel = {
       data: { deletedAt: new Date() },
     });
   },
+
+  // ─── Usage ────────────────────────────────────────────────────────
+  getUsage: async (userId: string) => {
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
+    return prisma.promptUsage.findUnique({
+      where: { userId_date: { userId, date: today } },
+    });
+  },
 };

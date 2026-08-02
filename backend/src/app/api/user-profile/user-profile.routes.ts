@@ -7,6 +7,7 @@ import {
   getSettings,
   updateSettings,
   deleteAccount,
+  getUsage,
 } from './user-profile.controller';
 import { userProfileValidators } from './user-profile.validators';
 
@@ -18,6 +19,7 @@ const router: Router = Router();
 // ─── Profile ──────────────────────────────────────────────────────────────────
 router.get('/:slugId', getProfile);
 router.patch('/:slugId', userProfileValidators.updateProfile, updateProfile);
+router.get('/:slugId/usage', getUsage);
 
 // ─── Password ─────────────────────────────────────────────────────────────────
 router.patch('/:slugId/password', userProfileValidators.changePassword, changePassword);

@@ -124,19 +124,19 @@ export class FlowsService {
    * The new methods explicitly calling the 4 roles
    */
   public async orchestrate(systemPrompt: string, userPrompt: string, imagesBase64: string[] = []): Promise<string> {
-    return this.runAgent(AGENTS.ORCHESTRATOR, systemPrompt, userPrompt, imagesBase64);
+    return this.runAgent(AGENTS.ORCHESTRATOR!, systemPrompt, userPrompt, imagesBase64);
   }
 
   public async illustrate(systemPrompt: string, userPrompt: string): Promise<string> {
-    return this.runAgent(AGENTS.ILLUSTRATOR, systemPrompt, userPrompt);
+    return this.runAgent(AGENTS.ILLUSTRATOR!, systemPrompt, userPrompt);
   }
 
   public async audit(systemPrompt: string, userPrompt: string): Promise<string> {
-    return this.runAgent(AGENTS.WRITER, systemPrompt, userPrompt);
+    return this.runAgent(AGENTS.WRITER!, systemPrompt, userPrompt);
   }
 
   public async formatPaperwork(systemPrompt: string, userPrompt: string): Promise<string> {
-    return this.runAgent(AGENTS.PAPERWORKER, systemPrompt, userPrompt);
+    return this.runAgent(AGENTS.PAPERWORKER!, systemPrompt, userPrompt);
   }
 
   // To remain backwards compatible temporarily or route automatically based on skill name

@@ -1,6 +1,9 @@
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
 import { useEffect } from 'react';
-import { FileText, Users, Clock, FolderOpen } from 'lucide-react';
+import { FileText, FolderOpen } from 'lucide-react';
+
+import type { SessionSummary } from '../../../services/sessions/sessions.types';
+import type { UsageData } from '../../../services/profile';
 
 const AnimatedCounter = ({ from, to, duration = 1.5, suffix = '' }: { from: number; to: number; duration?: number; suffix?: string }) => {
   const count = useMotionValue(from);
@@ -14,16 +17,24 @@ const AnimatedCounter = ({ from, to, duration = 1.5, suffix = '' }: { from: numb
   return <motion.span>{rounded}</motion.span>;
 };
 
-export const StatsOverview = () => {
+interface StatsOverviewProps {
+  sessions?: SessionSummary[];
+  usage?: UsageData;
+}
+
+export const StatsOverview = ({ sessions = [], usage = { count: 0, limit: 5 } }: StatsOverviewProps) => {
+  const oneWeekAgo = new Date();
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+  
+  const recentFlowsCount = sessions.filter(s => new Date(s.createdAt) >= oneWeekAgo).length;
+
   const stats = [
-    { label: 'Active Projects', value: 12, suffix: '', icon: FolderOpen, trend: '+2 this week', glow: 'bg-emerald-500/20', textGlow: 'text-emerald-400', border: 'border-emerald-500/30' },
-    { label: 'Flows Generated', value: 48, suffix: '', icon: FileText, trend: '+15 this week', glow: 'bg-blue-500/20', textGlow: 'text-blue-400', border: 'border-blue-500/30' },
-    { label: 'Team Members', value: 3, suffix: '', icon: Users, trend: 'Stable', glow: 'bg-purple-500/20', textGlow: 'text-purple-400', border: 'border-purple-500/30' },
-    { label: 'Hours Saved', value: 124, suffix: 'h', icon: Clock, trend: '+12h this week', glow: 'bg-orange-500/20', textGlow: 'text-orange-400', border: 'border-orange-500/30' },
+    { label: 'Flows Generated', value: sessions.length, suffix: '', icon: FolderOpen, trend: `+${recentFlowsCount} this week`, glow: 'bg-emerald-500/20', textGlow: 'text-emerald-400', border: 'border-emerald-500/30' },
+    { label: 'Daily API Credits', value: usage.count, suffix: ` / ${usage.limit}`, icon: FileText, trend: 'Resets at midnight', glow: 'bg-blue-500/20', textGlow: 'text-blue-400', border: 'border-blue-500/30' },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12 relative z-10">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 relative z-10">
       {stats.map((stat, i) => (
         <motion.div
           key={stat.label}

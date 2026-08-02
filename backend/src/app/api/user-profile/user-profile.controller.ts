@@ -1,4 +1,5 @@
 import { type Request, type Response } from 'express';
+import type { UsageResponse } from './user-profile.interface';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { UserProfileModel } from './user-profile.models';
@@ -296,6 +297,33 @@ export const deleteAccount = async (req: Request, res: Response) => {
     return res.status(200).json({ message: 'Account deleted successfully.' });
   } catch (error) {
     console.error('Delete Account Error:', (error as Error).message);
+    return res.status(500).json({ error: USER_PROFILE_MESSAGES.ERROR.INTERNAL_SERVER_ERROR });
+  }
+};
+
+// ─── GET /v1/user-profile/:slugId/usage ──────────────────────────────────────
+export const getUsage = async (req: Request, res: Response) => {
+  try {
+    const slugId = req.params.slugId as string;
+    const { user, status } = await resolveAndVerify(slugId, req.user?.id);
+
+    if (status === 401) return res.status(401).json({ error: 'Unauthorized.' });
+    if (status === 404) return res.status(404).json({ error: USER_PROFILE_MESSAGES.ERROR.USER_NOT_FOUND });
+    if (status === 403) return res.status(403).json({ error: USER_PROFILE_MESSAGES.ERROR.FORBIDDEN });
+
+    const usageRecord = await UserProfileModel.getUsage(user!.id);
+
+    const usage: UsageResponse = {
+      count: usageRecord ? usageRecord.count : 0,
+      limit: 5
+    };
+
+    return res.status(200).json({
+      message: USER_PROFILE_MESSAGES.SUCCESS.USAGE_FETCHED,
+      usage,
+    });
+  } catch (error) {
+    console.error('Get Usage Error:', (error as Error).message);
     return res.status(500).json({ error: USER_PROFILE_MESSAGES.ERROR.INTERNAL_SERVER_ERROR });
   }
 };

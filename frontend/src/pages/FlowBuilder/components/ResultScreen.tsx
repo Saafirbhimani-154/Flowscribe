@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { AlertTriangle, FileJson, Send, History, FileText, Plus, Trash2, LayoutTemplate, Activity } from 'lucide-react';
+import { AlertTriangle, FileJson, Send, History, FileText, Plus, Trash2, LayoutTemplate, Activity, Download } from 'lucide-react';
 import mermaid from 'mermaid';
 
 import { sessionsService } from '../../../services/sessions/sessions.service';
 import type { SessionSummary, SessionDetail } from '../../../services/sessions/sessions.types';
+import { generateProjectReadme } from '../../../utils/exportTemplate';
 
 import type { ResultScreenProps } from './ResultScreen-interface';
 
@@ -108,6 +109,20 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({ diagrams, audit, sch
     } finally {
       setSendingMessage(false);
     }
+  };
+
+  const exportToReadme = () => {
+    const md = generateProjectReadme(diagrams, audit, schema);
+
+    const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `project.md`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -248,6 +263,15 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({ diagrams, audit, sch
               {tab === 'SCHEMA' && 'SQL Schema'}
             </button>
           ))}
+          <div className="w-px bg-zinc-800 mx-1 h-6" />
+          <button
+            onClick={exportToReadme}
+            title="Download as project.md"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-medium text-zinc-400 hover:text-white hover:bg-zinc-700 transition"
+          >
+            <Download className="w-3.5 h-3.5" />
+            Download README
+          </button>
         </div>
 
         <div className="flex-1 overflow-y-auto bg-zinc-950 relative">
