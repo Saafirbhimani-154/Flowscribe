@@ -5,6 +5,7 @@ import { contactRoutes } from './api/contact';
 import { authMiddleware } from './middlewares/auth.middleware';
 import { flowsRoutes } from './api/flows/flows.routes';
 import { uploadRoutes } from './api/uploads/uploads.controller';
+import { sessionsRoutes } from './api/sessions';
 
 const router: Router = Router();
 
@@ -16,6 +17,7 @@ router.use('/v1/uploads', uploadRoutes);
 // ─── Protected routes (authMiddleware required) ───────────────────────────────
 router.use('/v1/user-profile', authMiddleware, userProfileRoutes);
 router.use('/v1/flows', flowsRoutes);
+router.use('/v1/sessions', sessionsRoutes);
 
 // Export for server.ts
 export default router;

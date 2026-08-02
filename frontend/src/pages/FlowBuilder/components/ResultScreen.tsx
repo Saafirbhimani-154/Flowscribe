@@ -1,7 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { AlertTriangle, FileJson, Send, History, FileText, Plus } from 'lucide-react';
+import { AlertTriangle, FileJson, Send, History, FileText, Plus, Trash2 } from 'lucide-react';
 import mermaid from 'mermaid';
 import type { Diagrams, AuditData, SchemaData } from '../../../types/flows.types';
+import { sessionsService } from '../../../services/sessions/sessions.service';
+import type { SessionSummary } from '../../../services/sessions/sessions.types';
+
 
 interface ResultScreenProps {
   activeTab: 'ACTIVITY' | 'STATE' | 'AUDIT' | 'SCHEMA';
@@ -10,14 +13,24 @@ interface ResultScreenProps {
   audit: AuditData | null;
   schema: SchemaData | null;
   onNewChat?: () => void;
+  activeSessionId?: string | null;
 }
 
-export const ResultScreen: React.FC<ResultScreenProps> = ({ diagrams, audit, schema, onNewChat }) => {
+export const ResultScreen: React.FC<ResultScreenProps> = ({ diagrams, audit, schema, onNewChat, activeSessionId }) => {
   const mermaidRef = useRef<HTMLPreElement>(null);
   const [chatMessage, setChatMessage] = useState('');
   const [mermaidError, setMermaidError] = useState<string | null>(null);
   const [middleTab, setMiddleTab] = useState<'ACTIVITY' | 'STATE'>('ACTIVITY');
   const [rightTab, setRightTab] = useState<'AUDIT' | 'SCHEMA'>('AUDIT');
+  const [sessions, setSessions] = useState<SessionSummary[]>([]);
+  const [sendingMessage, setSendingMessage] = useState(false);
+
+  // Fetch real session history
+  useEffect(() => {
+    sessionsService.listSessions()
+      .then(setSessions)
+      .catch(() => setSessions([]));
+  }, [activeSessionId]); // refresh when a new session is created
 
   useEffect(() => {
     mermaid.initialize({ startOnLoad: false, theme: 'dark', suppressErrorRendering: true });
@@ -71,20 +84,35 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({ diagrams, audit, sch
             <div className="font-semibold mb-0.5">Current Session</div>
             <div className="text-blue-300/60 truncate">Flow analyzed just now</div>
           </div>
-          {/* Previous placeholder sessions */}
-          {[
-            { title: 'User Onboarding Flow', sub: 'Yesterday' },
-            { title: 'Payment Gateway Flow', sub: 'Last week' },
-            { title: 'Signup Verification', sub: '2 weeks ago' },
-          ].map((item, i) => (
+          {/* Real sessions from DB */}
+          {sessions.filter(s => s.id !== activeSessionId).map((session) => (
             <div
-              key={i}
-              className="p-3 rounded-lg text-zinc-500 hover:bg-zinc-800/60 cursor-pointer text-xs leading-snug transition"
+              key={session.id}
+              className="group p-3 rounded-lg text-zinc-500 hover:bg-zinc-800/60 cursor-pointer text-xs leading-snug transition flex items-start justify-between"
             >
-              <div className="font-medium text-zinc-400">{item.title}</div>
-              <div className="text-zinc-600 mt-0.5">{item.sub}</div>
+              <div>
+                <div className="font-medium text-zinc-400 truncate max-w-[160px]">{session.title}</div>
+                <div className="text-zinc-600 mt-0.5">
+                  {new Date(session.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
+                  {' · '}{session._count.messages} msg{session._count.messages !== 1 ? 's' : ''}
+                </div>
+              </div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  sessionsService.deleteSession(session.id).then(() =>
+                    setSessions(prev => prev.filter(s => s.id !== session.id))
+                  );
+                }}
+                className="opacity-0 group-hover:opacity-100 text-zinc-600 hover:text-red-400 transition mt-0.5"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
             </div>
           ))}
+          {sessions.length === 0 && (
+            <div className="text-zinc-600 text-xs p-3 italic">No past sessions yet.</div>
+          )}
         </div>
       </div>
 
@@ -124,11 +152,27 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({ diagrams, audit, sch
               type="text"
               value={chatMessage}
               onChange={e => setChatMessage(e.target.value)}
+              onKeyDown={async (e) => {
+                if (e.key === 'Enter' && chatMessage.trim() && activeSessionId) {
+                  setSendingMessage(true);
+                  await sessionsService.addMessage(activeSessionId, chatMessage.trim(), 'USER', 'TEXT').catch(console.warn);
+                  setChatMessage('');
+                  setSendingMessage(false);
+                }
+              }}
               placeholder="Ask a follow-up, e.g. 'Add a Forgot Password branch'..."
               className="w-full bg-zinc-950 border border-zinc-700 focus:border-blue-500 rounded-full py-3 pl-5 pr-14 text-white text-sm focus:outline-none transition"
             />
             <button
-              className="absolute right-1.5 top-1.5 bottom-1.5 w-9 bg-blue-600 hover:bg-blue-500 rounded-full flex items-center justify-center transition"
+              disabled={!chatMessage.trim() || sendingMessage}
+              onClick={async () => {
+                if (!chatMessage.trim() || !activeSessionId) return;
+                setSendingMessage(true);
+                await sessionsService.addMessage(activeSessionId, chatMessage.trim(), 'USER', 'TEXT').catch(console.warn);
+                setChatMessage('');
+                setSendingMessage(false);
+              }}
+              className="absolute right-1.5 top-1.5 bottom-1.5 w-9 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 rounded-full flex items-center justify-center transition"
             >
               <Send className="w-4 h-4 text-white" />
             </button>

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import mermaid from 'mermaid';
 import type { FlowBuilderStep, SessionData, Diagrams, AuditData, SchemaData } from '../../types/flows.types';
-import { flowsService } from '../../services/flows.service';
+import { flowsService } from '../../services/flows/flows.service';
+import { sessionsService } from '../../services/sessions/sessions.service';
 import { compressImages } from '../../utils/imageCompressor';
 import { UploadScreen } from './components/UploadScreen';
 import { QuestionScreen } from './components/QuestionScreen';
@@ -28,6 +29,9 @@ export default function FlowBuilderPage() {
   const [audit, setAudit] = useState<AuditData | null>(null);
   const [schema, setSchema] = useState<SchemaData | null>(null);
 
+  // Active DB session ID (for persisting chat history)
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setFiles(Array.from(e.target.files).slice(0, 5));
@@ -39,7 +43,6 @@ export default function FlowBuilderPage() {
   };
 
   const handleNewChat = () => {
-    // Reset everything and go back to upload
     setStep('UPLOAD');
     setFiles([]);
     setContext('');
@@ -50,6 +53,7 @@ export default function FlowBuilderPage() {
     setAudit(null);
     setSchema(null);
     setError(null);
+    setActiveSessionId(null);
   };
 
   const handleAnalyze = async () => {
@@ -58,9 +62,17 @@ export default function FlowBuilderPage() {
     setError(null);
 
     try {
-      // Compress all images client-side before sending to the backend
+      // 1. Compress images before upload
       const filesToSend = files.length > 0 ? await compressImages(files) : [];
 
+      // 2. Create a DB session to persist this analysis
+      const title = sessionData?.title || (context ? context.slice(0, 50) : 'Flow Analysis');
+      const dbSession = await sessionsService.createSession(title, context || undefined).catch(() => null);
+      if (dbSession) {
+        setActiveSessionId(dbSession.id);
+      }
+
+      // 3. Run the LLM analysis
       const data = await flowsService.analyzeFlow(filesToSend, context);
       setSessionData(data.sessionData);
 
@@ -68,7 +80,7 @@ export default function FlowBuilderPage() {
         setQuestions(data.questions);
         setStep('QUESTIONS');
       } else {
-        await handleComplete(data.sessionData, {});
+        await handleComplete(data.sessionData, {}, dbSession?.id ?? null);
       }
     } catch (err: any) {
       setError(err.message);
@@ -77,7 +89,11 @@ export default function FlowBuilderPage() {
     }
   };
 
-  const handleComplete = async (currentSessionData = sessionData, currentAnswers = answers) => {
+  const handleComplete = async (
+    currentSessionData = sessionData,
+    currentAnswers = answers,
+    sessionId: string | null = activeSessionId
+  ) => {
     if (!currentSessionData) return;
 
     setLoading(true);
@@ -89,6 +105,12 @@ export default function FlowBuilderPage() {
       setAudit(data.audit);
       setSchema(data.schema);
       setStep('RESULTS');
+
+      // 4. Persist the result to DB
+      if (sessionId) {
+        await sessionsService.saveResult(sessionId, data.diagrams, data.audit, data.schema).catch(console.warn);
+        await sessionsService.addMessage(sessionId, 'Analysis complete. Diagrams and audit generated.', 'ASSISTANT', 'RESULT').catch(console.warn);
+      }
 
       setTimeout(() => mermaid.contentLoaded(), 100);
     } catch (err: any) {
@@ -131,6 +153,7 @@ export default function FlowBuilderPage() {
           audit={audit}
           schema={schema}
           onNewChat={handleNewChat}
+          activeSessionId={activeSessionId}
         />
       )}
     </div>
