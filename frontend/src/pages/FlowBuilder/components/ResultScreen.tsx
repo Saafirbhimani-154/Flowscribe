@@ -57,7 +57,7 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({ diagrams, audit, sch
   }, [sessionDetail?.messages]);
 
   useEffect(() => {
-    if (rightTab === 'ACTIVITY' || rightTab === 'STATE') {
+    if ((rightTab === 'ACTIVITY' || rightTab === 'STATE') && diagramMode === 'PREVIEW') {
       mermaid.initialize({ startOnLoad: false, theme: 'dark', suppressErrorRendering: true });
       setMermaidError(null);
       // Only run mermaid if the ref exists and the chart has content
@@ -70,7 +70,7 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({ diagrams, audit, sch
         });
       }
     }
-  }, [rightTab, diagrams]);
+  }, [rightTab, diagrams, diagramMode]);
 
   const renderMermaid = (chart: string | null | undefined) => {
     if (!chart || chart.trim().length === 0) {
@@ -86,14 +86,14 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({ diagrams, audit, sch
 
     if (diagramMode === 'RAW') {
       return (
-        <div className="w-full h-full bg-zinc-950 p-6 pt-16 overflow-auto">
+        <div key="raw" className="w-full h-full bg-zinc-950 p-6 pt-16 overflow-auto">
           <pre className="text-xs text-blue-400 leading-relaxed font-mono whitespace-pre-wrap">{chart}</pre>
         </div>
       );
     }
 
     return (
-      <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-950 p-8 overflow-auto">
+      <div key="preview" className="w-full h-full flex flex-col items-center justify-center bg-zinc-950 p-8 overflow-auto">
         {mermaidError ? (
           <div className="max-w-xl w-full bg-red-900/20 border border-red-500/30 rounded-xl p-6 text-center">
             <p className="text-red-400 font-semibold mb-2">⚠️ Diagram syntax error</p>

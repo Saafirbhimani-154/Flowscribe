@@ -31,7 +31,7 @@ const upload = multer({
   },
 });
 
-export const uploadRoutes = Router();
+export const uploadRoutes: Router = Router();
 
 /**
  * POST /api/v1/uploads
