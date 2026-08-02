@@ -13,8 +13,14 @@ export const analyzeFlow = async (req: Request, res: Response, next: NextFunctio
 
     const imagesBase64 = files.map(file => file.buffer.toString('base64'));
 
+    const { context } = req.body;
+    
     const visionSystemPrompt = await flowsService.loadSkill('vision_extract');
-    const userPrompt = "Please extract the logical process flow from these images and return ONLY valid JSON matching the specified schema.";
+    let userPrompt = "Please extract the logical process flow from these images and return ONLY valid JSON matching the specified schema.";
+    
+    if (context && context.trim() !== '') {
+      userPrompt = `User's Additional Context: "${context.trim()}"\n\n${userPrompt}`;
+    }
     
     console.log('[analyzeFlow] Calling LLM Vision...');
     const visionOutput = await flowsService.generateCompletion(visionSystemPrompt, userPrompt, imagesBase64);

@@ -1,9 +1,12 @@
 import type { SessionData, Diagrams, AuditData, SchemaData } from '../types/flows.types';
 
 export const flowsService = {
-  analyzeFlow: async (files: File[]) => {
+  analyzeFlow: async (files: File[], context: string = '') => {
     const formData = new FormData();
     files.forEach(file => formData.append('images', file));
+    if (context) {
+      formData.append('context', context);
+    }
 
     const res = await fetch('/api/v1/flows/analyze', {
       method: 'POST',

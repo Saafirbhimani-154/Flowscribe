@@ -93,7 +93,7 @@ export const register = async (req: Request, res: Response) => {
 
     // B-1: Do NOT return the token in the body — it lives only in the HTTP-only cookie
     return res.status(201).json({
-      message: (existingUser) ? AUTH_MESSAGES.SUCCESS.RESTORED : AUTH_MESSAGES.SUCCESS.REGISTERED,
+      message: AUTH_MESSAGES.SUCCESS.REGISTERED,
       auth: {
         id: user.id,
         email: user.email,

@@ -13,6 +13,7 @@ export default function FlowBuilderPage() {
 
   // Upload State
   const [files, setFiles] = useState<File[]>([]);
+  const [context, setContext] = useState<string>('');
   
   // Analyze State
   const [sessionData, setSessionData] = useState<SessionData | null>(null);
@@ -33,13 +34,17 @@ export default function FlowBuilderPage() {
     }
   };
 
+  const handleContextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setContext(e.target.value);
+  };
+
   const handleAnalyze = async () => {
     if (files.length === 0) return;
     setLoading(true);
     setError(null);
 
     try {
-      const data = await flowsService.analyzeFlow(files);
+      const data = await flowsService.analyzeFlow(files, context);
       setSessionData(data.sessionData);
       
       if (data.questions && data.questions.length > 0) {
@@ -81,7 +86,9 @@ export default function FlowBuilderPage() {
       {step === 'UPLOAD' && (
         <UploadScreen
           files={files}
+          context={context}
           onFileChange={handleFileChange}
+          onContextChange={handleContextChange}
           onAnalyze={handleAnalyze}
           loading={loading}
           error={error}

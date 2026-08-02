@@ -3,13 +3,15 @@ import { Upload, Code, Loader2 } from 'lucide-react';
 
 interface UploadScreenProps {
   files: File[];
+  context: string;
   onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onContextChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onAnalyze: () => void;
   loading: boolean;
   error: string | null;
 }
 
-export const UploadScreen: React.FC<UploadScreenProps> = ({ files, onFileChange, onAnalyze, loading, error }) => {
+export const UploadScreen: React.FC<UploadScreenProps> = ({ files, context, onFileChange, onContextChange, onAnalyze, loading, error }) => {
   return (
     <div className="max-w-2xl mx-auto text-center space-y-8 mt-20">
       <h1 className="text-4xl font-bold">Upload Process Flow</h1>
@@ -29,6 +31,16 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({ files, onFileChange,
         ) : (
           <div className="text-zinc-300 font-medium">Drag & drop or click to upload</div>
         )}
+      </div>
+
+      <div className="text-left">
+        <label className="block text-sm font-medium text-zinc-400 mb-2">Additional Context (Optional)</label>
+        <textarea
+          value={context}
+          onChange={onContextChange}
+          placeholder="E.g., This is a user onboarding flow. The main goal is to capture their email and preferences."
+          className="w-full bg-zinc-900/50 border border-zinc-700 rounded-xl p-4 text-white focus:outline-none focus:border-blue-500 transition min-h-[120px]"
+        />
       </div>
       
       <button 
