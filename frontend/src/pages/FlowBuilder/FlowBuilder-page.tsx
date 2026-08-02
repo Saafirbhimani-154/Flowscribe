@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import mermaid from 'mermaid';
 import type { FlowBuilderStep, SessionData, Diagrams, AuditData, SchemaData } from '../../types/flows.types';
 import { flowsService } from '../../services/flows.service';
+import { compressImages } from '../../utils/imageCompressor';
 import { UploadScreen } from './components/UploadScreen';
 import { QuestionScreen } from './components/QuestionScreen';
 import { ResultScreen } from './components/ResultScreen';
@@ -14,19 +15,18 @@ export default function FlowBuilderPage() {
   // Upload State
   const [files, setFiles] = useState<File[]>([]);
   const [context, setContext] = useState<string>('');
-  
+
   // Analyze State
   const [sessionData, setSessionData] = useState<SessionData | null>(null);
   const [questions, setQuestions] = useState<string[]>([]);
-  
+
   // Questions State
   const [answers, setAnswers] = useState<Record<string, string>>({});
-  
+
   // Results State
   const [diagrams, setDiagrams] = useState<Diagrams | null>(null);
   const [audit, setAudit] = useState<AuditData | null>(null);
   const [schema, setSchema] = useState<SchemaData | null>(null);
-  const [activeTab, setActiveTab] = useState<'ACTIVITY' | 'STATE' | 'AUDIT' | 'SCHEMA'>('ACTIVITY');
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -38,15 +38,32 @@ export default function FlowBuilderPage() {
     setContext(e.target.value);
   };
 
+  const handleNewChat = () => {
+    // Reset everything and go back to upload
+    setStep('UPLOAD');
+    setFiles([]);
+    setContext('');
+    setSessionData(null);
+    setQuestions([]);
+    setAnswers({});
+    setDiagrams(null);
+    setAudit(null);
+    setSchema(null);
+    setError(null);
+  };
+
   const handleAnalyze = async () => {
     if (files.length === 0 && (!context || context.trim() === '')) return;
     setLoading(true);
     setError(null);
 
     try {
-      const data = await flowsService.analyzeFlow(files, context);
+      // Compress all images client-side before sending to the backend
+      const filesToSend = files.length > 0 ? await compressImages(files) : [];
+
+      const data = await flowsService.analyzeFlow(filesToSend, context);
       setSessionData(data.sessionData);
-      
+
       if (data.questions && data.questions.length > 0) {
         setQuestions(data.questions);
         setStep('QUESTIONS');
@@ -62,7 +79,7 @@ export default function FlowBuilderPage() {
 
   const handleComplete = async (currentSessionData = sessionData, currentAnswers = answers) => {
     if (!currentSessionData) return;
-    
+
     setLoading(true);
     setError(null);
 
@@ -72,7 +89,7 @@ export default function FlowBuilderPage() {
       setAudit(data.audit);
       setSchema(data.schema);
       setStep('RESULTS');
-      
+
       setTimeout(() => mermaid.contentLoaded(), 100);
     } catch (err: any) {
       setError(err instanceof Error ? err.message : String(err));
@@ -94,7 +111,7 @@ export default function FlowBuilderPage() {
           error={error}
         />
       )}
-      
+
       {step === 'QUESTIONS' && (
         <QuestionScreen
           questions={questions}
@@ -105,14 +122,15 @@ export default function FlowBuilderPage() {
           error={error}
         />
       )}
-      
+
       {step === 'RESULTS' && (
         <ResultScreen
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
+          activeTab={'ACTIVITY'}
+          setActiveTab={() => {}}
           diagrams={diagrams}
           audit={audit}
           schema={schema}
+          onNewChat={handleNewChat}
         />
       )}
     </div>

@@ -69,13 +69,26 @@ export const completeFlow = async (req: Request, res: Response, next: NextFuncti
       return res.status(400).json({ success: false, message: FLOWS_MESSAGES.ERROR.SESSION_REQUIRED });
     }
 
-    const auditSystemPrompt = await flowsService.loadSkill('gap_audit');
+    // ── Load both skill prompts in parallel ────────────────────────────────
+    const [auditSystemPrompt, diagramSystemPrompt] = await Promise.all([
+      flowsService.loadSkill('gap_audit'),
+      flowsService.loadSkill('diagrams'),
+    ]);
+
     const auditUserPrompt = `Flow Data:\n${JSON.stringify(sessionData, null, 2)}\n\nUser Clarifications:\n${JSON.stringify(answers || {}, null, 2)}\n\nPlease conduct a gap audit and return ONLY valid JSON with 'gaps' and 'edgeCases' arrays.`;
-    
-    console.log('[completeFlow] Calling LLM Gap Audit...');
-    const auditOutput = await flowsService.generateCompletion('WRITER', auditSystemPrompt, auditUserPrompt);
+    const diagramUserPrompt = `Flow Data:\n${JSON.stringify(sessionData, null, 2)}\n\nClarifications:\n${JSON.stringify(answers || {}, null, 2)}\n\nPlease generate activity and stateMachine diagrams plus Database Schema. Return ONLY valid JSON.`;
+
+    // ── Run WRITER (audit) and ILLUSTRATOR (diagrams) in PARALLEL ──────────
+    console.log('[completeFlow] Launching Gap Audit + Diagrams in parallel...');
+    const [auditOutput, diagramOutput] = await Promise.all([
+      flowsService.generateCompletion('WRITER', auditSystemPrompt, auditUserPrompt),
+      flowsService.generateCompletion('ILLUSTRATOR', diagramSystemPrompt, diagramUserPrompt),
+    ]);
+    console.log('[completeFlow] Both agents finished.');
+
     const cleanedAuditOutput = flowsService.cleanJson(auditOutput);
-    
+    const cleanedDiagramOutput = flowsService.cleanJson(diagramOutput);
+
     let audit = { gaps: [], edgeCases: [] };
     try {
       audit = JSON.parse(cleanedAuditOutput);
@@ -83,13 +96,6 @@ export const completeFlow = async (req: Request, res: Response, next: NextFuncti
       console.warn(FLOWS_MESSAGES.ERROR.INVALID_JSON_AUDIT);
     }
 
-    const diagramSystemPrompt = await flowsService.loadSkill('diagrams');
-    const diagramUserPrompt = `Flow Data:\n${JSON.stringify(sessionData, null, 2)}\n\nClarifications:\n${JSON.stringify(answers || {}, null, 2)}\n\nPlease generate Mermaid diagrams (activity, stateMachine) and Database Schema tables. Return ONLY valid JSON.`;
-    
-    console.log('[completeFlow] Calling LLM Diagrams...');
-    const diagramOutput = await flowsService.generateCompletion('ILLUSTRATOR', diagramSystemPrompt, diagramUserPrompt);
-    const cleanedDiagramOutput = flowsService.cleanJson(diagramOutput);
-    
     let result = { diagrams: { activity: '', stateMachine: '' }, schema: { tables: [] } };
     try {
       result = JSON.parse(cleanedDiagramOutput);
