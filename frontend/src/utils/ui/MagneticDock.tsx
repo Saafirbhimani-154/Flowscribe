@@ -82,15 +82,7 @@ function DockIcon({ icon: Icon, mouseX, title, href, badge }: DockIconProps) {
   );
 }
 
-export interface MagneticDockProps {
-  items: {
-    title: string;
-    icon?: React.ElementType;
-    href?: string;
-    badge?: number;
-    isSeparator?: boolean;
-  }[];
-}
+import type { MagneticDockProps } from './ui-interfaces';
 
 export function MagneticDock({ items }: MagneticDockProps) {
   const mouseX = useMotionValue(Infinity);

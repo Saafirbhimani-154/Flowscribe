@@ -1,12 +1,7 @@
 import { motion } from 'framer-motion';
-import type { ReactNode } from 'react';
 
-interface SocialAuthButtonProps {
-  icon: ReactNode;
-  label: string;
-  onClick?: () => void;
-  disabled?: boolean;
-}
+
+import type { SocialAuthButtonProps } from './ui-interfaces';
 
 export default function SocialAuthButton({ icon, label, onClick, disabled }: SocialAuthButtonProps) {
   return (

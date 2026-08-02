@@ -1,14 +1,7 @@
 import React from 'react';
 import { MessageSquare, CheckCircle, Loader2 } from 'lucide-react';
 
-interface QuestionScreenProps {
-  questions: string[];
-  answers: Record<string, string>;
-  setAnswers: React.Dispatch<React.SetStateAction<Record<string, string>>>;
-  onComplete: () => void;
-  loading: boolean;
-  error: string | null;
-}
+import type { QuestionScreenProps } from './QuestionScreen-interface';
 
 export const QuestionScreen: React.FC<QuestionScreenProps> = ({ questions, answers, setAnswers, onComplete, loading, error }) => {
   return (

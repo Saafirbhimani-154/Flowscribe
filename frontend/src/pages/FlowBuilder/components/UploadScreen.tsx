@@ -2,17 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Upload, Code, Loader2, BrainCircuit, FileJson, Layers, X, AlertCircle } from 'lucide-react';
 import { MarkdownEditor } from '../../../components/MarkdownEditor';
 
-interface UploadScreenProps {
-  files: File[];
-  context: string;
-  droppedCount: number;
-  onAddFiles: (files: File[]) => void;
-  onRemoveFile: (idx: number) => void;
-  onContextChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  onAnalyze: () => void;
-  loading: boolean;
-  error: string | null;
-}
+import type { UploadScreenProps } from './UploadScreen-interface';
 
 export const UploadScreen: React.FC<UploadScreenProps> = ({
   files,

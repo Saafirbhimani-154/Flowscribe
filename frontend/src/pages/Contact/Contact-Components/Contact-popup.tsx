@@ -1,10 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, X } from 'lucide-react';
 
-interface ContactPopupProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
+import type { ContactPopupProps } from './Contact-interface';
 
 export default function ContactPopup({ isOpen, onClose }: ContactPopupProps) {
   return (

@@ -1,13 +1,6 @@
-export interface AgentConfig {
-  mainModel: string;
-  fallbackModel: string;
-  mainKeyEnv: string;
-  fallbackKeyEnv: string;
-  mainBaseUrl: string;
-  fallbackBaseUrl: string;
-}
+import type { AgentConfig } from './flows.interface';
 
-export const AGENTS = {
+export const AGENTS: Record<string, AgentConfig> = {
   ORCHESTRATOR: {
     mainModel: 'meta/llama-3.2-90b-vision-instruct',
     fallbackModel: 'microsoft/phi-3-vision-128k-instruct',

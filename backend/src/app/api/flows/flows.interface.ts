@@ -27,3 +27,12 @@ export interface AuditOutput {
 export interface SchemaOutput {
   tables: any[];
 }
+
+export interface AgentConfig {
+  mainModel: string;
+  fallbackModel: string;
+  mainKeyEnv: string;
+  fallbackKeyEnv: string;
+  mainBaseUrl: string;
+  fallbackBaseUrl: string;
+}

@@ -1,22 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AlertTriangle, FileJson, Send, History, FileText, Plus, Trash2, LayoutTemplate, Activity } from 'lucide-react';
 import mermaid from 'mermaid';
-import type { Diagrams, AuditData, SchemaData } from '../../../types/flows.types';
+
 import { sessionsService } from '../../../services/sessions/sessions.service';
 import type { SessionSummary, SessionDetail } from '../../../services/sessions/sessions.types';
 
-
-interface ResultScreenProps {
-  activeTab: 'ACTIVITY' | 'STATE' | 'AUDIT' | 'SCHEMA';
-  setActiveTab: React.Dispatch<React.SetStateAction<'ACTIVITY' | 'STATE' | 'AUDIT' | 'SCHEMA'>>;
-  diagrams: Diagrams | null;
-  audit: AuditData | null;
-  schema: SchemaData | null;
-  onNewChat?: () => void;
-  activeSessionId?: string | null;
-  /** When true the internal sidebar is hidden (parent already renders one) */
-  hideSidebar?: boolean;
-}
+import type { ResultScreenProps } from './ResultScreen-interface';
 
 export const ResultScreen: React.FC<ResultScreenProps> = ({ diagrams, audit, schema, onNewChat, activeSessionId, hideSidebar }) => {
   const mermaidRef = useRef<HTMLPreElement>(null);

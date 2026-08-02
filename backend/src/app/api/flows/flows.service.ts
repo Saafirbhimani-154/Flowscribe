@@ -1,7 +1,8 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-import { AgentConfig, AGENTS } from './flowagent.constants';
+import { AGENTS } from './flowagent.constants';
+import type { FlowSessionData, AgentConfig } from './flows.interface';
 
 export class FlowsService {
   constructor() {}

@@ -1,13 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Eye, Code2 } from 'lucide-react';
 
-interface MarkdownEditorProps {
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  placeholder?: string;
-  className?: string;
-  borderClass?: string;
-}
+import type { MarkdownEditorProps } from './MarkdownEditor-interface';
 
 /** Lightweight inline Markdown → HTML renderer (no external libraries) */
 function renderMarkdown(md: string): string {

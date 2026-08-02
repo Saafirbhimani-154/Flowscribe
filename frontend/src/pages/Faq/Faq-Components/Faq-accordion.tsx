@@ -2,11 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Minus } from 'lucide-react';
 
-interface FaqAccordionProps {
-  num: string;
-  title: string;
-  content: string;
-}
+import type { FaqAccordionProps } from './Faq-interface';
 
 export default function FaqAccordion({ num, title, content }: FaqAccordionProps) {
   const [isOpen, setIsOpen] = useState(false);

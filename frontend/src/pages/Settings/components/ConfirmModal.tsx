@@ -1,16 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, X } from 'lucide-react';
 
-interface ConfirmModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  title: string;
-  message: string;
-  confirmText?: string;
-  isDanger?: boolean;
-  isLoading?: boolean;
-}
+import type { ConfirmModalProps } from './ConfirmModal-interface';
 
   import { useEffect } from 'react';
   
