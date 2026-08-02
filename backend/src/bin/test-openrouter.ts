@@ -16,7 +16,7 @@ async function testOpenRouter() {
   console.log(`🔍 Found ${apiKeys.length} API key(s) to test.`);
 
   for (let i = 0; i < apiKeys.length; i++) {
-    const key = apiKeys[i];
+    const key = apiKeys[i] || '';
     console.log(`\n======================================`);
     console.log(`🧪 Testing Key #${i + 1} (${key.substring(0, 10)}...)`);
     console.log(`======================================`);

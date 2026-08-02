@@ -1,6 +1,6 @@
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
 import { useEffect } from 'react';
-import { Activity, FileText, Users, Clock, FolderOpen } from 'lucide-react';
+import { FileText, Users, Clock, FolderOpen } from 'lucide-react';
 
 const AnimatedCounter = ({ from, to, duration = 1.5, suffix = '' }: { from: number; to: number; duration?: number; suffix?: string }) => {
   const count = useMotionValue(from);
@@ -49,7 +49,7 @@ export const StatsOverview = () => {
           {/* Subtle background gradient that glows on hover */}
           <div className={`absolute -bottom-8 -right-8 w-32 h-32 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-opacity duration-500 ${stat.glow}`} />
           {/* Hover Border Glow */}
-          <div className={`absolute inset-0 rounded-3xl border transition-colors duration-500 opacity-0 group-hover:opacity-100 ${stat.border}`} pointerEvents="none" />
+          <div className={`absolute inset-0 rounded-3xl border transition-colors duration-500 opacity-0 group-hover:opacity-100 pointer-events-none ${stat.border}`} />
         </motion.div>
       ))}
     </div>

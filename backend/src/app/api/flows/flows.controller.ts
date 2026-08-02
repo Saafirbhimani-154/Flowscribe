@@ -7,13 +7,13 @@ export const analyzeFlow = async (req: Request, res: Response, next: NextFunctio
   try {
     const files = req.files as Express.Multer.File[];
     
-    if (!files || files.length === 0) {
-      return res.status(400).json({ success: false, message: FLOWS_MESSAGES.ERROR.NO_IMAGES });
+    const { context } = req.body;
+
+    if ((!files || files.length === 0) && (!context || context.trim() === '')) {
+      return res.status(400).json({ success: false, message: FLOWS_MESSAGES.ERROR.NO_INPUT });
     }
 
-    const imagesBase64 = files.map(file => file.buffer.toString('base64'));
-
-    const { context } = req.body;
+    const imagesBase64 = files ? files.map(file => file.buffer.toString('base64')) : [];
     
     const visionSystemPrompt = await flowsService.loadSkill('vision_extract');
     let userPrompt = "Please extract the logical process flow from these images and return ONLY valid JSON matching the specified schema.";
@@ -23,7 +23,7 @@ export const analyzeFlow = async (req: Request, res: Response, next: NextFunctio
     }
     
     console.log('[analyzeFlow] Calling LLM Vision...');
-    const visionOutput = await flowsService.generateCompletion(visionSystemPrompt, userPrompt, imagesBase64);
+    const visionOutput = await flowsService.generateCompletion('ORCHESTRATOR', visionSystemPrompt, userPrompt, imagesBase64);
     const cleanedVisionOutput = flowsService.cleanJson(visionOutput);
     
     let sessionData: FlowSessionData;
@@ -38,7 +38,7 @@ export const analyzeFlow = async (req: Request, res: Response, next: NextFunctio
     const ambiguityUserPrompt = `Here is the extracted flow data:\n${JSON.stringify(sessionData, null, 2)}\n\nPlease generate clarifying questions for any ambiguities. Return ONLY a valid JSON array of strings.`;
     
     console.log('[analyzeFlow] Calling LLM Ambiguity...');
-    const ambiguityOutput = await flowsService.generateCompletion(ambiguitySystemPrompt, ambiguityUserPrompt);
+    const ambiguityOutput = await flowsService.generateCompletion('ORCHESTRATOR', ambiguitySystemPrompt, ambiguityUserPrompt);
     const cleanedAmbiguityOutput = flowsService.cleanJson(ambiguityOutput);
     
     let questions: string[] = [];
@@ -73,7 +73,7 @@ export const completeFlow = async (req: Request, res: Response, next: NextFuncti
     const auditUserPrompt = `Flow Data:\n${JSON.stringify(sessionData, null, 2)}\n\nUser Clarifications:\n${JSON.stringify(answers || {}, null, 2)}\n\nPlease conduct a gap audit and return ONLY valid JSON with 'gaps' and 'edgeCases' arrays.`;
     
     console.log('[completeFlow] Calling LLM Gap Audit...');
-    const auditOutput = await flowsService.generateCompletion(auditSystemPrompt, auditUserPrompt);
+    const auditOutput = await flowsService.generateCompletion('WRITER', auditSystemPrompt, auditUserPrompt);
     const cleanedAuditOutput = flowsService.cleanJson(auditOutput);
     
     let audit = { gaps: [], edgeCases: [] };
@@ -87,7 +87,7 @@ export const completeFlow = async (req: Request, res: Response, next: NextFuncti
     const diagramUserPrompt = `Flow Data:\n${JSON.stringify(sessionData, null, 2)}\n\nClarifications:\n${JSON.stringify(answers || {}, null, 2)}\n\nPlease generate Mermaid diagrams (activity, stateMachine) and Database Schema tables. Return ONLY valid JSON.`;
     
     console.log('[completeFlow] Calling LLM Diagrams...');
-    const diagramOutput = await flowsService.generateCompletion(diagramSystemPrompt, diagramUserPrompt);
+    const diagramOutput = await flowsService.generateCompletion('ILLUSTRATOR', diagramSystemPrompt, diagramUserPrompt);
     const cleanedDiagramOutput = flowsService.cleanJson(diagramOutput);
     
     let result = { diagrams: { activity: '', stateMachine: '' }, schema: { tables: [] } };

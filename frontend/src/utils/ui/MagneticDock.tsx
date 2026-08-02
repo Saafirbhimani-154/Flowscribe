@@ -7,10 +7,10 @@ import {
   AnimatePresence,
 } from "framer-motion";
 import { Link } from "react-router-dom";
-import type { LucideIcon } from "lucide-react";
+
 
 interface DockIconProps {
-  icon: LucideIcon;
+  icon: React.ElementType;
   mouseX: any;
   title: string;
   href?: string;
@@ -85,7 +85,7 @@ function DockIcon({ icon: Icon, mouseX, title, href, badge }: DockIconProps) {
 export interface MagneticDockProps {
   items: {
     title: string;
-    icon?: LucideIcon;
+    icon?: React.ElementType;
     href?: string;
     badge?: number;
     isSeparator?: boolean;

@@ -14,6 +14,7 @@ export const FLOWS_CONSTANTS = {
 
 export const FLOWS_MESSAGES = {
   ERROR: {
+    NO_INPUT: 'Please provide either an image or a text description to generate a flow.',
     NO_IMAGES: 'No images uploaded.',
     INVALID_JSON_VISION: 'LLM returned invalid JSON structure from vision extraction.',
     INVALID_JSON_QUESTIONS: 'Failed to parse questions JSON.',

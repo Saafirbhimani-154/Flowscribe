@@ -39,7 +39,7 @@ export default function FlowBuilderPage() {
   };
 
   const handleAnalyze = async () => {
-    if (files.length === 0) return;
+    if (files.length === 0 && (!context || context.trim() === '')) return;
     setLoading(true);
     setError(null);
 

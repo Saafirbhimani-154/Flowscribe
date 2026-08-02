@@ -45,7 +45,7 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({ files, context, onFi
       
       <button 
         onClick={onAnalyze} 
-        disabled={files.length === 0 || loading}
+        disabled={(files.length === 0 && context.trim() === '') || loading}
         className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold py-4 rounded-xl flex items-center justify-center transition"
       >
         {loading ? <Loader2 className="animate-spin mr-2" /> : <Code className="mr-2" />}

@@ -2,7 +2,7 @@ import { DashboardHeader } from './components/DashboardHeader';
 import { QuickActions } from './components/QuickActions';
 import { StatsOverview } from './components/StatsOverview';
 import { RecentActivity } from './components/RecentActivity';
-import ConstellationCanvas from '../../../utils/ui/ConstellationCanvas';
+import ConstellationCanvas from '../../utils/ui/ConstellationCanvas';
 
 export default function OwnerDashboardPage() {
   return (
