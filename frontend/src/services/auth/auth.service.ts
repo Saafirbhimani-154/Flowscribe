@@ -38,5 +38,9 @@ export const registerService = async (credentials: RegisterCredentials): Promise
 };
 
 export const logoutService = async () => {
-  await fetch(`${API_URL}/auth/logout`, { method: 'POST', credentials: 'include' });
+  const res = await fetch(`${API_URL}/auth/logout`, { method: 'POST', credentials: 'include' });
+  if (!res.ok) {
+    const error = await parseJsonSafe(res);
+    throw new Error(errorMessage(error, 'Logout failed'));
+  }
 };

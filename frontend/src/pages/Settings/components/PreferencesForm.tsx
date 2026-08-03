@@ -4,7 +4,10 @@ import ConfirmModal from './ConfirmModal';
 import { API_URL } from '../../../config/api';
 
 export default function PreferencesForm({ slug }: { slug: string }) {
-  const [formData, setFormData] = useState({ language: 'en', theme: 'system' });
+  const [formData, setFormData] = useState({ language: 'en', theme: 'system', timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC' });
+
+  // Dynamically get all IANA timezones supported by the browser
+  const timezones = Intl.supportedValuesOf('timeZone');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -15,7 +18,7 @@ export default function PreferencesForm({ slug }: { slug: string }) {
         if (res.ok) {
           const data = await res.json();
           if (data && data.settings) {
-            setFormData({ language: data.settings.language, theme: data.settings.theme });
+            setFormData({ language: data.settings.language, theme: data.settings.theme, timezone: data.settings.timezone || 'UTC' });
           }
         } else {
           console.error('Failed to load preferences: server returned error');
@@ -71,10 +74,29 @@ export default function PreferencesForm({ slug }: { slug: string }) {
             className="w-full bg-white border border-brand-secondary/50 rounded-xl px-4 py-3 pr-10 focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all text-brand-text appearance-none"
           >
             <option value="en">English (US)</option>
-            <option value="hi">Hindi</option>
-            <option value="es">Spanish</option>
-            <option value="fr">French</option>
-            <option value="de">German</option>
+            <option value="hi">Hindi (हिन्दी)</option>
+            <option value="es">Spanish (Español)</option>
+            <option value="fr">French (Français)</option>
+            <option value="de">German (Deutsch)</option>
+            <option value="ja">Japanese (日本語)</option>
+            <option value="zh">Chinese (中文)</option>
+            <option value="ar">Arabic (العربية)</option>
+          </select>
+          <ChevronDown className="w-5 h-5 text-gray-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-semibold text-brand-text mb-2 uppercase tracking-wide">Timezone</label>
+        <div className="relative">
+          <select
+            value={formData.timezone}
+            onChange={(e) => setFormData({ ...formData, timezone: e.target.value })}
+            className="w-full bg-white border border-brand-secondary/50 rounded-xl px-4 py-3 pr-10 focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all text-brand-text appearance-none"
+          >
+            {timezones.map((tz) => (
+              <option key={tz} value={tz}>{tz.replace(/_/g, ' ')}</option>
+            ))}
           </select>
           <ChevronDown className="w-5 h-5 text-gray-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
         </div>
@@ -118,7 +140,7 @@ export default function PreferencesForm({ slug }: { slug: string }) {
         onClose={() => setIsModalOpen(false)}
         onConfirm={handleConfirmSave}
         title="Change Preferences"
-        message={`Are you sure you want to change your language to ${formData.language.toUpperCase()} and theme to ${formData.theme}?`}
+        message={`Are you sure you want to change your language to ${formData.language.toUpperCase()}, timezone to ${formData.timezone}, and theme to ${formData.theme}?`}
         confirmText="Save Changes"
         isLoading={status === 'loading'}
       />

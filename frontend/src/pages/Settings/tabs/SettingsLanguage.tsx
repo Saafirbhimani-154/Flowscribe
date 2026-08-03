@@ -9,7 +9,7 @@ export default function SettingsLanguage() {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-xl">
       <div className="mb-8">
         <h3 className="text-2xl font-domine font-bold text-brand-text mb-2">Preferences</h3>
-        <p className="text-brand-muted">Customize your workspace language and theme.</p>
+        <p className="text-brand-muted">Customize your workspace language, timezone, and theme.</p>
       </div>
 
       <PreferencesForm slug={slug || ''} />
