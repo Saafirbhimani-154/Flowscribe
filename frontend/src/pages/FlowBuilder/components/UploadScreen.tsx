@@ -164,6 +164,14 @@ export const UploadScreen: React.FC<UploadScreenProps> = ({
         <p className="text-zinc-500 text-sm -mt-4">{files.length} / 5 image{files.length !== 1 ? 's' : ''} selected</p>
       )}
 
+      {/* Vision-model single-image notice */}
+      {files.length > 1 && (
+        <div className="flex items-center gap-2 text-blue-300 bg-blue-500/10 border border-blue-500/20 rounded-lg px-4 py-3 text-sm text-left">
+          <AlertCircle className="w-4 h-4 shrink-0" />
+          Our vision model can only read one image per analysis — only the first photo above will be sent to the AI. Reorder or remove images so the most important one is first.
+        </div>
+      )}
+
       {/* Context editor */}
       <div className="text-left relative">
         <div className="flex justify-between items-end mb-2">

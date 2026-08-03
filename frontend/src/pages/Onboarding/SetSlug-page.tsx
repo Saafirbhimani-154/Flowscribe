@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
+import { API_URL } from '../../config/api';
+import { parseJsonSafe } from '../../lib/http';
 
 export default function SetSlugPage() {
   const [slug, setSlug] = useState('');
@@ -29,18 +31,17 @@ export default function SetSlugPage() {
     const checkAvailability = async () => {
       setStatus('checking');
       try {
-        const API_URL = import.meta.env.VITE_API_URL;
         const res = await fetch(`${API_URL}/auth/check-slug/${slug}`, {
           credentials: 'include',
         });
-        const data = await res.json();
+        const data = await parseJsonSafe(res);
         
-        if (res.ok && data.available) {
+        if (res.ok && data && data.available) {
           setStatus('available');
         } else {
           setStatus('taken');
         }
-      } catch (err) {
+      } catch {
         setStatus('error');
       }
     };
@@ -55,7 +56,6 @@ export default function SetSlugPage() {
     
     setIsSubmitting(true);
     try {
-      const API_URL = import.meta.env.VITE_API_URL;
       const res = await fetch(`${API_URL}/user-profile/${currentSlug}/slug`, {
         method: 'PATCH',
         headers: {

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ConfirmModal from './ConfirmModal';
+import { API_URL } from '../../../config/api';
 
 export default function DangerZone() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -11,7 +12,7 @@ export default function DangerZone() {
   const handleDelete = async () => {
     setIsModalOpen(false);
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/user-profile/${slug}`, {
+      const res = await fetch(`${API_URL}/user-profile/${slug}`, {
         method: 'DELETE',
         credentials: 'include'
       });

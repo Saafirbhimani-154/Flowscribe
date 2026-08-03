@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Loader2, Eye, EyeOff } from 'lucide-react';
 import ConfirmModal from './ConfirmModal';
+import { API_URL } from '../../../config/api';
+import { parseJsonSafe, errorMessage } from '../../../lib/http';
 
 export default function PasswordForm({ slug }: { slug: string }) {
   const [formData, setFormData] = useState({ currentPassword: '', newPassword: '', confirmNewPassword: '' });
@@ -43,15 +45,15 @@ export default function PasswordForm({ slug }: { slug: string }) {
     
     setStatus('loading');
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/user-profile/${slug}/password`, {
+      const res = await fetch(`${API_URL}/user-profile/${slug}/password`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify(formData),
       });
       if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error || 'Failed to update');
+        const errData = await parseJsonSafe(res);
+        throw new Error(errorMessage(errData, 'Failed to update'));
       }
       setStatus('success');
       setFormData({ currentPassword: '', newPassword: '', confirmNewPassword: '' });

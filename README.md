@@ -13,13 +13,20 @@ It generates the standard system-design diagram set (Activity, State Machine, Us
 - **Frontend:** React + Vite + TypeScript + TailwindCSS + beautiful Skeleton Loaders for UX (Port 7000)
 - **Backend:** Node.js + Express + TypeScript (Port 5000)
 - **Database / ORM:** PostgreSQL (Docker) + Prisma
-- **Caching/Queueing:** Redis + BullMQ (for handling multiple users calling the LLM)
-- **Real-Time UX:** Socket.io for streaming backend progress to the frontend
 - **Authentication:** Standard Email/Password stored via HTTP-only Session Cookies (w/ unique Slug IDs).
-- **Data Persistence:** Persistent raw image storage via Google Drive (auto-pruned at 30GB).
+- **Data Persistence:** Uploaded images are stored on the backend's local disk with a scheduled sweep that removes stale files.
 - **AI Engine:** OpenRouter for dynamic model routing (GPT/Claude/Gemini) to process multimodal inputs.
-- **Features:** Strict image limits (max 5 images), Speech-to-Text (STT) for voice prompting, interactive Chatbot UI, and a one-click "Convert to README" export.
+- **Features:** Strict image limits (max 5 images, and only the first image is currently sent to the vision model), interactive Chatbot UI.
 - **Tooling:** pnpm workspaces, Docker Compose (for local dev/deploy)
+
+### Roadmap (not yet shipped)
+These are directional, not implemented:
+- **Caching/Queueing:** Redis + BullMQ for handling multiple concurrent LLM calls.
+- **Real-Time UX:** Socket.io for streaming backend progress to the frontend.
+- **Data Persistence:** Long-term raw image storage via Google Drive (auto-pruned at 30GB).
+- **Speech-to-Text (STT)** for voice prompting.
+- **One-click "Convert to README" export.**
+- **Additional diagram types** beyond the current Activity, State Machine, Use Case, and Data Flow Diagram set.
 
 ### 1. Frontend Architecture
 ```text

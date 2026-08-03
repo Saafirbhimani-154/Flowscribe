@@ -1,6 +1,6 @@
 import type { LoginCredentials, RegisterCredentials, AuthResponse } from './auth.types';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
+import { API_URL } from '../../config/api';
+import { parseJsonSafe, errorMessage } from '../../lib/http';
 
 export const loginService = async (credentials: LoginCredentials): Promise<AuthResponse> => {
   const res = await fetch(`${API_URL}/auth/login`, {
@@ -11,8 +11,8 @@ export const loginService = async (credentials: LoginCredentials): Promise<AuthR
   });
   
   if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error.error || 'Login failed');
+    const error = await parseJsonSafe(res);
+    throw new Error(errorMessage(error, 'Login failed'));
   }
   
   const data: AuthResponse = await res.json();
@@ -29,8 +29,8 @@ export const registerService = async (credentials: RegisterCredentials): Promise
   });
   
   if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error.error || 'Registration failed');
+    const error = await parseJsonSafe(res);
+    throw new Error(errorMessage(error, 'Registration failed'));
   }
   
   const data: AuthResponse = await res.json();
@@ -38,5 +38,9 @@ export const registerService = async (credentials: RegisterCredentials): Promise
 };
 
 export const logoutService = async () => {
-  await fetch(`${API_URL}/auth/logout`, { method: 'POST', credentials: 'include' });
+  const res = await fetch(`${API_URL}/auth/logout`, { method: 'POST', credentials: 'include' });
+  if (!res.ok) {
+    const error = await parseJsonSafe(res);
+    throw new Error(errorMessage(error, 'Logout failed'));
+  }
 };

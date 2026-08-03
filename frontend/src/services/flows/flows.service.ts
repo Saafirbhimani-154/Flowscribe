@@ -1,7 +1,7 @@
 import type { SessionData } from '../../types/flows.types';
 import type { UploadedFile, FlowAnalyzeResponse, FlowCompleteResponse } from './flows.types';
-
-const API_URL = import.meta.env.VITE_API_URL || '';
+import { API_URL } from '../../config/api';
+import { parseJsonSafe, errorMessage } from '../../lib/http';
 
 export const flowsService = {
   /**
@@ -19,8 +19,8 @@ export const flowsService = {
       body: formData,
     });
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || 'Failed to upload images');
+    const data = await parseJsonSafe(res);
+    if (!res.ok) throw new Error(errorMessage(data, 'Failed to upload images'));
     return data.files;
   },
 
@@ -40,8 +40,8 @@ export const flowsService = {
       body: formData,
     });
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || 'Failed to analyze flow');
+    const data = await parseJsonSafe(res);
+    if (!res.ok) throw new Error(errorMessage(data, 'Failed to analyze flow'));
     return data.data;
   },
 
@@ -56,8 +56,8 @@ export const flowsService = {
       body: JSON.stringify({ sessionData, answers }),
     });
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || 'Failed to complete flow');
+    const data = await parseJsonSafe(res);
+    if (!res.ok) throw new Error(errorMessage(data, 'Failed to complete flow'));
     return data.data;
   },
 };

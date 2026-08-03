@@ -12,3 +12,4 @@ docs/
 .env.production
 
 .key
+.trash/

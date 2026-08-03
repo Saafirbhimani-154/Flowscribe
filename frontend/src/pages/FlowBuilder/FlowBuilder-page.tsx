@@ -98,11 +98,17 @@ export default function FlowBuilderPage() {
       // 1. Compress images before upload
       const filesToSend = files.length > 0 ? await compressImages(files) : [];
 
-      // 2. Create a DB session to persist this analysis
+      // 2. Create a DB session to persist this analysis. If this fails,
+      // the analysis still proceeds (no reason to block the user's work),
+      // but we let them know their results won't be saved to history.
       const title = sessionData?.title || (context ? context.slice(0, 50) : 'Flow Analysis');
-      const dbSession = await sessionsService.createSession({ title, contextMessage: context || undefined }).catch(() => null);
-      if (dbSession) {
+      let dbSession: { id: string; title: string } | null = null;
+      try {
+        dbSession = await sessionsService.createSession({ title, contextMessage: context || undefined });
         setActiveSessionId(dbSession.id);
+      } catch (sessionErr) {
+        console.warn('Failed to create session:', sessionErr);
+        setError('Note: this analysis will not be saved to your history.');
       }
 
       // 3. Run the LLM analysis
@@ -140,10 +146,16 @@ export default function FlowBuilderPage() {
       setSchema(data.schema);
       setStep('RESULTS');
 
-      // 4. Persist the result to DB
+      // 4. Persist the result to DB. The server records the assistant's
+      // "analysis complete" chat message itself as part of saveResult —
+      // the client is not permitted to write ASSISTANT-role messages.
       if (sessionId) {
-        await sessionsService.saveResult(sessionId, { diagrams: data.diagrams, audit: data.audit, schema: data.schema }).catch(console.warn);
-        await sessionsService.addMessage(sessionId, 'Analysis complete. Diagrams and audit generated.', 'ASSISTANT', 'RESULT').catch(console.warn);
+        try {
+          await sessionsService.saveResult(sessionId, { diagrams: data.diagrams, audit: data.audit, schema: data.schema });
+        } catch (saveErr) {
+          console.warn('Failed to save analysis result:', saveErr);
+          setError('Your results are shown below, but could not be saved to history.');
+        }
       }
 
       setTimeout(() => mermaid.contentLoaded(), 100);
@@ -190,6 +202,7 @@ export default function FlowBuilderPage() {
                   }
                 } catch (err) {
                   console.warn('Failed to load session:', err);
+                  setError('Could not load that session. Please try again.');
                 }
               }}
               className={`group p-3 rounded-lg cursor-pointer text-xs leading-snug transition flex items-start justify-between ${
@@ -210,9 +223,12 @@ export default function FlowBuilderPage() {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  sessionsService.deleteSession(session.id).then(() =>
-                    setSessions(prev => prev.filter(s => s.id !== session.id))
-                  );
+                  sessionsService.deleteSession(session.id)
+                    .then(() => setSessions(prev => prev.filter(s => s.id !== session.id)))
+                    .catch(err => {
+                      console.warn('Failed to delete session:', err);
+                      setError('Could not delete that session. Please try again.');
+                    });
                 }}
                 className="opacity-0 group-hover:opacity-100 text-zinc-600 hover:text-red-400 transition mt-0.5 shrink-0"
               >

@@ -1,6 +1,6 @@
 import type { UsageData } from './profile.types';
-
-const API_URL = import.meta.env.VITE_API_URL || '';
+import { API_URL } from '../../config/api';
+import { parseJsonSafe, errorMessage } from '../../lib/http';
 
 export const profileService = {
   getUsage: async (slugId: string): Promise<UsageData> => {
@@ -12,11 +12,11 @@ export const profileService = {
       credentials: 'include'
     });
 
+    const data = await parseJsonSafe(res);
     if (!res.ok) {
-      throw new Error('Failed to fetch usage');
+      throw new Error(errorMessage(data, 'Failed to fetch usage'));
     }
 
-    const data = await res.json();
     return data.usage as UsageData;
   }
 };
