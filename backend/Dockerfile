@@ -33,6 +33,10 @@ COPY --from=builder /app/package.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/src/database ./src/database
+# FlowsService.loadSkill() resolves skill prompts relative to its own
+# compiled location (dist/app/api/flows -> ../../../skills), so the
+# runtime skills folder must live at dist/skills, not src/skills.
+COPY --from=builder /app/src/skills ./dist/skills
 
 EXPOSE 5000
 

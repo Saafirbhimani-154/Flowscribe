@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import ConfirmModal from './ConfirmModal';
+import { API_URL } from '../../../config/api';
 
 export default function ProfileForm({ slug }: { slug: string }) {
   const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '' });
@@ -17,7 +18,7 @@ export default function ProfileForm({ slug }: { slug: string }) {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/user-profile/${slug}`, { credentials: 'include' });
+        const res = await fetch(`${API_URL}/user-profile/${slug}`, { credentials: 'include' });
         if (res.ok) {
           const data = await res.json();
           if (data && data.user) {
@@ -56,7 +57,7 @@ export default function ProfileForm({ slug }: { slug: string }) {
     setIsModalOpen(false);
     setStatus('loading');
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/user-profile/${slug}`, {
+      const res = await fetch(`${API_URL}/user-profile/${slug}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

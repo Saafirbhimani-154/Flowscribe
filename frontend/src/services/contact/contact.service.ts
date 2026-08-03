@@ -1,6 +1,6 @@
 import type { ContactData, ContactResponse } from './contact.types';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
+import { API_URL } from '../../config/api';
+import { parseJsonSafe, errorMessage } from '../../lib/http';
 
 export const ContactService = {
   async sendMessage(data: ContactData): Promise<ContactResponse> {
@@ -11,11 +11,11 @@ export const ContactService = {
       body: JSON.stringify(data)
     });
 
+    const parsed = await parseJsonSafe(res);
     if (!res.ok) {
-      const error = await res.json();
-      throw error;
+      throw new Error(errorMessage(parsed, 'Failed to send message'));
     }
 
-    return res.json();
+    return parsed as ContactResponse;
   }
 };

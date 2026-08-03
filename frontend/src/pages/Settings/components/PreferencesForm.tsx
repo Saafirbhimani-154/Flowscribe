@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Loader2, ChevronDown } from 'lucide-react';
 import ConfirmModal from './ConfirmModal';
+import { API_URL } from '../../../config/api';
 
 export default function PreferencesForm({ slug }: { slug: string }) {
   const [formData, setFormData] = useState({ language: 'en', theme: 'system' });
@@ -10,7 +11,7 @@ export default function PreferencesForm({ slug }: { slug: string }) {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/user-profile/${slug}/settings`, { credentials: 'include' });
+        const res = await fetch(`${API_URL}/user-profile/${slug}/settings`, { credentials: 'include' });
         if (res.ok) {
           const data = await res.json();
           if (data && data.settings) {
@@ -45,7 +46,7 @@ export default function PreferencesForm({ slug }: { slug: string }) {
     setIsModalOpen(false);
     setStatus('loading');
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/user-profile/${slug}/settings`, {
+      const res = await fetch(`${API_URL}/user-profile/${slug}/settings`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

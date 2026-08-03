@@ -22,11 +22,13 @@ const upload = multer({
   }
 });
 
-// Protect all flow routes with Auth and Rate Limit
+// Protect all flow routes with Auth; rate-limit only the expensive
+// vision extraction call (`/analyze`). `/complete` continues the SAME
+// analysis session and previously consumed a second daily credit for
+// what is really one logical "analysis" from the user's perspective.
 router.use(authMiddleware);
-router.use(rateLimitMiddleware);
 
-router.post('/analyze', upload.array('images', 5), analyzeFlow);
+router.post('/analyze', rateLimitMiddleware, upload.array('images', 5), analyzeFlow);
 router.post('/complete', completeFlow);
 
 export { router as flowsRoutes };

@@ -12,7 +12,16 @@ export default function SignupForm({ onSubmit, isLoading }: SignupFormProps) {
   
   const schema: ValidationSchema<{ name: string; email: string; password: string; confirmPassword: string }> = useMemo(() => ({
     name: [
-      { validate: (val) => val.length >= 2, message: VALIDATION_MESSAGES.NAME_MIN_LENGTH }
+      { validate: (val) => val.length >= 2, message: VALIDATION_MESSAGES.NAME_MIN_LENGTH },
+      {
+        // Backend requires firstName AND lastName, each >= 2 chars — a single-word
+        // name here would submit an empty lastName and fail with a confusing error.
+        validate: (val) => {
+          const parts = val.trim().split(/\s+/);
+          return parts.length >= 2 && parts[0].length >= 2 && parts.slice(1).join(' ').length >= 2;
+        },
+        message: VALIDATION_MESSAGES.NAME_REQUIRE_FULL_NAME
+      }
     ],
     email: emailValidationRules,
     password: passwordValidationRules,

@@ -1,6 +1,12 @@
 // ============================================================================
 // File: health.routes.ts
-// Purpose: Placeholder established for project folder structure.
+// Purpose: GET /api/v1/health — public liveness endpoint, no auth required.
 // ============================================================================
-// TODO: Implement logic
+import { Router } from 'express';
+import { getHealth } from './health.controller';
 
+const router: Router = Router();
+
+router.get('/', getHealth);
+
+export { router as healthRoutes };

@@ -1,30 +1,23 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { AlertTriangle, FileJson, Send, History, FileText, Plus, Trash2, LayoutTemplate, Activity, Download } from 'lucide-react';
+import { AlertTriangle, FileJson, Send, FileText, LayoutTemplate, Activity, Download } from 'lucide-react';
 import mermaid from 'mermaid';
 
 import { sessionsService } from '../../../services/sessions/sessions.service';
-import type { SessionSummary, SessionDetail } from '../../../services/sessions/sessions.types';
+import type { SessionDetail } from '../../../services/sessions/sessions.types';
 import { generateProjectReadme } from '../../../utils/exportTemplate';
 
 import type { ResultScreenProps } from './ResultScreen-interface';
 
-export const ResultScreen: React.FC<ResultScreenProps> = ({ diagrams, audit, schema, onNewChat, activeSessionId, hideSidebar }) => {
+export const ResultScreen: React.FC<ResultScreenProps> = ({ diagrams, audit, schema, activeSessionId }) => {
   const mermaidRef = useRef<HTMLPreElement>(null);
   const [chatMessage, setChatMessage] = useState('');
   const [mermaidError, setMermaidError] = useState<string | null>(null);
   const [diagramMode, setDiagramMode] = useState<'PREVIEW' | 'RAW'>('PREVIEW');
   const [rightTab, setRightTab] = useState<'ACTIVITY' | 'STATE' | 'AUDIT' | 'SCHEMA'>('ACTIVITY');
-  const [sessions, setSessions] = useState<SessionSummary[]>([]);
   const [sessionDetail, setSessionDetail] = useState<SessionDetail | null>(null);
   const [sendingMessage, setSendingMessage] = useState(false);
+  const [chatError, setChatError] = useState<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
-
-  // Fetch real session history
-  useEffect(() => {
-    sessionsService.listSessions()
-      .then(setSessions)
-      .catch(() => setSessions([]));
-  }, [activeSessionId]);
 
   const fetchSessionDetails = async () => {
     if (activeSessionId) {
@@ -33,6 +26,7 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({ diagrams, audit, sch
         setSessionDetail(detail);
       } catch (err) {
         console.warn('Failed to load session details', err);
+        setChatError('Could not load this session\'s history.');
       }
     }
   };
@@ -100,12 +94,14 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({ diagrams, audit, sch
   const handleSendMessage = async () => {
     if (!chatMessage.trim() || !activeSessionId) return;
     setSendingMessage(true);
+    setChatError(null);
     try {
       await sessionsService.addMessage(activeSessionId, chatMessage.trim(), 'USER', 'TEXT');
       setChatMessage('');
       await fetchSessionDetails();
     } catch (err) {
       console.warn(err);
+      setChatError('Failed to send message. Please try again.');
     } finally {
       setSendingMessage(false);
     }
@@ -127,71 +123,6 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({ diagrams, audit, sch
 
   return (
     <div className="flex h-full w-full bg-zinc-950 text-sm overflow-hidden">
-      {/* ─── LEFT PANEL: HISTORY (only when not hidden by parent) ─── */}
-      {!hideSidebar && (
-        <div className="w-60 shrink-0 border-r border-zinc-800 bg-zinc-900 flex flex-col">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800">
-            <span className="font-semibold text-zinc-300 flex items-center gap-2">
-              <History className="w-4 h-4" /> History
-            </span>
-            <button
-              onClick={onNewChat}
-              title="New analysis"
-              className="text-zinc-400 hover:text-blue-400 transition"
-            >
-              <Plus className="w-5 h-5" />
-            </button>
-          </div>
-
-          <div className="flex-1 overflow-y-auto p-2 space-y-1">
-            {sessions.map((session) => {
-              const isActive = session.id === activeSessionId;
-              return (
-                <div
-                  key={session.id}
-                  onClick={async () => {
-                    // Handled in FlowBuilder-page onClick wrapper, but we need to pass the event if it's there?
-                    // Wait, FlowBuilder-page provides the list? No! ResultScreen renders the list!
-                    // Wait! The sidebar is rendered by ResultScreen only if !hideSidebar.
-                    // BUT hideSidebar is TRUE in FlowBuilder-page when step === 'RESULTS'!
-                    // So ResultScreen's sidebar is actually HIDDEN in FlowBuilder-page!
-                  }}
-                  className={`group p-3 rounded-lg cursor-pointer text-xs leading-snug transition flex items-start justify-between ${
-                    isActive 
-                      ? 'bg-blue-500/10 border border-blue-500/20 text-blue-400' 
-                      : 'text-zinc-500 hover:bg-zinc-800/60'
-                  }`}
-                >
-                  <div className="min-w-0">
-                    <div className={`font-medium truncate max-w-[148px] ${isActive ? 'text-blue-400' : 'text-zinc-400'}`}>
-                      {session.title}
-                    </div>
-                    <div className={isActive ? 'text-blue-300/60 mt-0.5' : 'text-zinc-600 mt-0.5'}>
-                      {new Date(session.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
-                      {' · '}{session._count?.messages || 0} msg{(session._count?.messages || 0) !== 1 ? 's' : ''}
-                    </div>
-                  </div>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      sessionsService.deleteSession(session.id).then(() =>
-                        setSessions(prev => prev.filter(s => s.id !== session.id))
-                      );
-                    }}
-                    className="opacity-0 group-hover:opacity-100 text-zinc-600 hover:text-red-400 transition mt-0.5 shrink-0"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              );
-            })}
-            {sessions.length === 0 && (
-              <div className="text-zinc-600 text-xs p-3 italic">No past sessions yet.</div>
-            )}
-          </div>
-        </div>
-      )}
-
       {/* ─── CENTER PANEL: CHAT INTERFACE ────────────────── */}
       <div className="flex-1 flex flex-col min-w-0 bg-zinc-900/20">
         <div className="flex items-center px-4 py-3 border-b border-zinc-800 bg-zinc-900/40">
@@ -217,6 +148,9 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({ diagrams, audit, sch
 
         {/* Re-chat input - padded to prevent dock obstruction */}
         <div className="px-4 pt-3 pb-8 lg:pb-12 border-t border-zinc-800 bg-zinc-900/60 backdrop-blur-sm">
+          {chatError && (
+            <div className="max-w-3xl mx-auto mb-2 text-xs text-red-400">{chatError}</div>
+          )}
           <div className="relative max-w-3xl mx-auto">
             <input
               type="text"
