@@ -18,7 +18,7 @@ const issueTokenCookie = (res: Response, userId: string, roleId: string) => {
   res.cookie('flowscribe_token', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict', // M-5: Consistent strict on both login and sliding session
+    sameSite: 'none', // M-5: Consistent strict on both login and sliding session
     maxAge: 30 * 60 * 1000 // 30 minutes
   });
 };
@@ -162,7 +162,7 @@ export const logout = async (req: Request, res: Response) => {
   res.clearCookie('flowscribe_token', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    sameSite: 'none', // M-5: Consistent strict on both login and sliding session
   });
   return res.status(200).json({ message: 'Logged out successfully.' });
 };

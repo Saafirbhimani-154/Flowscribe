@@ -28,7 +28,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
     res.cookie('flowscribe_token', refreshedToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'None',
       maxAge: 30 * 60 * 1000 // 30 minutes in milliseconds
     });
 
