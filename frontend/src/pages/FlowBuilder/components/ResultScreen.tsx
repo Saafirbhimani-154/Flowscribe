@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AlertTriangle, FileJson, Send, FileText, LayoutTemplate, Activity, Download } from 'lucide-react';
 import mermaid from 'mermaid';
 
@@ -19,7 +19,7 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({ diagrams, audit, sch
   const [chatError, setChatError] = useState<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  const fetchSessionDetails = async () => {
+  const fetchSessionDetails = useCallback(async () => {
     if (activeSessionId) {
       try {
         const detail = await sessionsService.getSession(activeSessionId);
@@ -29,11 +29,11 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({ diagrams, audit, sch
         setChatError('Could not load this session\'s history.');
       }
     }
-  };
+  }, [activeSessionId]);
 
   useEffect(() => {
     fetchSessionDetails();
-  }, [activeSessionId]);
+  }, [fetchSessionDetails]);
 
   useEffect(() => {
     // Scroll to bottom on new messages

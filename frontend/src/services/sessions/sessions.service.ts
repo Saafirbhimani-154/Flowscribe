@@ -5,25 +5,7 @@ import type {
   SaveResultPayload,
 } from './sessions.types';
 import { API_URL } from '../../config/api';
-
-// Safely parses a JSON response body. Falls back to a generic message
-// instead of throwing a confusing "Unexpected token <" when the server
-// (or a proxy in front of it) returns a non-JSON error page.
-async function parseJsonSafe(res: Response): Promise<any> {
-  const contentType = res.headers.get('content-type') || '';
-  if (!contentType.includes('application/json')) {
-    return null;
-  }
-  try {
-    return await res.json();
-  } catch {
-    return null;
-  }
-}
-
-function errorMessage(data: any, fallback: string): string {
-  return (data && data.message) || fallback;
-}
+import { parseJsonSafe, errorMessage } from '../../lib/http';
 
 export const sessionsService = {
   listSessions: async (): Promise<SessionSummary[]> => {

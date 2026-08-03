@@ -41,7 +41,7 @@ export default function SetSlugPage() {
         } else {
           setStatus('taken');
         }
-      } catch (err) {
+      } catch {
         setStatus('error');
       }
     };

@@ -55,7 +55,7 @@ export default function PreferencesForm({ slug }: { slug: string }) {
       if (!res.ok) throw new Error('Failed to update');
       setStatus('success');
       setTimeout(() => setStatus('idle'), 3000);
-    } catch (err) {
+    } catch {
       setStatus('error');
     }
   };
