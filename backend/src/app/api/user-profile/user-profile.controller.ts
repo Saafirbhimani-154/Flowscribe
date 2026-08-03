@@ -143,7 +143,7 @@ export const changePassword = async (req: Request, res: Response) => {
     res.cookie('flowscribe_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'none',
       maxAge: 30 * 60 * 1000,
     });
 
@@ -291,7 +291,7 @@ export const deleteAccount = async (req: Request, res: Response) => {
     res.clearCookie('flowscribe_token', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'none',
     });
 
     return res.status(200).json({ message: 'Account deleted successfully.' });

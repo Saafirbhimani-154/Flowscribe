@@ -5,7 +5,15 @@ import { AUTH_MESSAGES } from '../api/auth/auth.messages';
 
 export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   try {
+    console.log("========== AUTH ==========");
+    console.log("Origin:", req.headers.origin);
+    console.log("Cookies:", req.cookies);
+    console.log("Cookie Header:", req.headers.cookie);
+    console.log("==========================");
+    
     const token = req.cookies?.flowscribe_token;
+
+    console.log("Token:", token);
 
     if (!token) {
       return res.status(401).json({ error: AUTH_MESSAGES.ERROR.UNAUTHORIZED });
@@ -28,7 +36,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
     res.cookie('flowscribe_token', refreshedToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'None',
+      sameSite: 'none',
       maxAge: 30 * 60 * 1000 // 30 minutes in milliseconds
     });
 
